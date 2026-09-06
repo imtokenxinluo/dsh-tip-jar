@@ -47,35 +47,32 @@ const CSS =
   '.sps-note{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-empty{color:var(--dsw-alias-label-secondary);padding:16px 0}' +
   '.sps-errors{color:var(--dsw-alias-state-error-primary);font-size:12px;margin:0;padding-left:16px}' +
-  '.sps-card{border:1px solid var(--dsw-alias-border-l1);border-radius:10px;background:var(--dsw-alias-bg-layer-1);padding:12px 14px;display:flex;flex-direction:column;gap:8px}' +
-  '.sps-card-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}' +
+  '.sps-card{border:1px solid var(--dsw-alias-border-l1);border-radius:10px;background:var(--dsw-alias-bg-layer-1);padding:10px 12px;display:flex;flex-direction:column;gap:6px}' +
+  '.sps-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
   '.sps-alias{font-weight:600;font-size:14px}' +
-  '.sps-badge{font-size:11px;color:var(--dsw-alias-state-warn-primary);border:1px solid var(--dsw-alias-state-warn-primary);border-radius:10px;padding:0 8px}' +
-  '.sps-badge-ok{font-size:11px;color:var(--dsw-alias-state-success-primary);border:1px solid var(--dsw-alias-state-success-primary);border-radius:10px;padding:0 8px}' +
-  '.sps-badge-vol{font-size:11px;color:var(--dsw-alias-state-success-primary);border:1px solid var(--dsw-alias-state-success-primary);border-radius:10px;padding:0 8px}' +
-  '.sps-badge-pw{font-size:11px;color:var(--dsw-alias-state-error-primary);border:1px solid var(--dsw-alias-state-error-primary);border-radius:10px;padding:0 8px}' +
-  '.sps-badge-un{font-size:11px;color:var(--dsw-alias-label-secondary);border:1px solid var(--dsw-alias-border-l1);border-radius:10px;padding:0 8px}' +
-  '.sps-badge-ds{font-size:11px;color:var(--dsw-alias-state-warn-primary);border:1px solid var(--dsw-alias-state-warn-primary);border-radius:10px;padding:0 8px}' +
+  '.sps-badge{font-size:10px;color:var(--dsw-alias-state-warn-primary);border:1px solid var(--dsw-alias-state-warn-primary);border-radius:10px;padding:0 6px}' +
+  '.sps-badge-ok{font-size:10px;color:var(--dsw-alias-state-success-primary);border:1px solid var(--dsw-alias-state-success-primary);border-radius:10px;padding:0 6px}' +
+  '.sps-badge-vol{font-size:10px;color:var(--dsw-alias-state-success-primary);border:1px solid var(--dsw-alias-state-success-primary);border-radius:10px;padding:0 6px}' +
+  '.sps-badge-pw{font-size:10px;color:var(--dsw-alias-state-error-primary);border:1px solid var(--dsw-alias-state-error-primary);border-radius:10px;padding:0 6px}' +
+  '.sps-badge-un{font-size:10px;color:var(--dsw-alias-label-secondary);border:1px solid var(--dsw-alias-border-l1);border-radius:10px;padding:0 6px}' +
+  '.sps-badge-ds{font-size:10px;color:var(--dsw-alias-state-warn-primary);border:1px solid var(--dsw-alias-state-warn-primary);border-radius:10px;padding:0 6px}' +
   '.sps-bio{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
-  '.sps-addr-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
-  '.sps-label{font-size:11px;color:var(--dsw-alias-label-secondary);text-transform:uppercase;letter-spacing:.04em}' +
-  '.sps-addr{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:6px;padding:3px 8px;width:300px;color:var(--dsw-alias-label-primary)}' +
-  '.sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:12px;padding:3px 10px}' +
+  '.sps-addr-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' +
+  '.sps-label{font-size:10px;color:var(--dsw-alias-label-secondary);text-transform:uppercase;letter-spacing:.04em}' +
+  '.sps-addr{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:2px 6px;width:200px;color:var(--dsw-alias-label-primary)}' +
+  '.sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:5px;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:11px;padding:2px 8px;display:inline-flex;align-items:center;justify-content:center}' +
   '.sps-btn:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}' +
-  '.sps-qr{width:110px;height:110px;border:1px solid var(--dsw-alias-border-l1);border-radius:8px}' +
-  '.sps-qr-row{display:flex;align-items:flex-start;gap:12px}' +
-  '.sps-links{display:flex;flex-wrap:wrap;gap:8px}' +
-  '.sps-link{font-size:12px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
+  '.sps-qr{width:76px;height:76px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;object-fit:contain}' +
+  '.sps-qr-row{display:flex;align-items:center;gap:10px}' +
+  '.sps-links{display:flex;flex-wrap:wrap;gap:5px;align-items:center}' +
+  '.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
   '.sps-link:hover{text-decoration:underline}' +
-  '.sps-qr-chips{display:inline-flex;gap:6px;flex-wrap:wrap}' +
-  '.sps-qr-chip{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:14px;color:var(--dsw-alias-label-primary);cursor:pointer;font-size:11px;padding:3px 12px}' +
-  '.sps-qr-chip:hover{border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-brand-primary)}' +
-  '.sps-qrcode-note{font-size:10px;color:var(--dsw-alias-label-secondary);line-height:1.4;margin-top:2px}' +
-  '.sps-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999}' +
-  '.sps-modal{position:relative;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:12px;padding:16px;min-width:220px;max-width:80vw;box-shadow:0 8px 30px rgba(0,0,0,.3)}' +
-  '.sps-modal-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:14px}' +
-  '.sps-modal-title{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary);margin-bottom:10px;text-align:center}' +
-  '.sps-modal-img{width:240px;height:240px;border-radius:8px;object-fit:contain;display:block;margin:0 auto}' +
+  '.sps-qr-chips{display:inline-flex;gap:5px;flex-wrap:wrap}' +
+  '.sps-pay-codes{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}' +
+  '.sps-pay-code{display:flex;flex-direction:column;align-items:center;gap:2px}' +
+  '.sps-pay-label{font-size:10px;color:var(--dsw-alias-label-secondary)}' +
+  '.sps-pay-row{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}' +
+  '.sps-qrcode-note{font-size:9px;color:var(--dsw-alias-label-secondary);line-height:1.3;margin-top:1px}' +
   '.sps-sec-title{font-size:11px;color:var(--dsw-alias-label-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}' +
   '.sps-sponsor{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-sponsor b{color:var(--dsw-alias-state-warn-primary)}' +
@@ -99,7 +96,6 @@ function SponsorCenter(props) {
   const [state, setState] = useState(null)
   const [tipState, setTipState] = useState({ stats: null, present: false, paused: false })
   const [copiedId, setCopiedId] = useState(null)
-  const [qrView, setQrView] = useState(null)
   const dataRef = useRef(null)
   const tipRef = useRef({ stats: null, present: false })
 
@@ -238,21 +234,20 @@ function SponsorCenter(props) {
           return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, '订阅: ' + s.label)
         }))
       : null
-    // 收款码（微信/支付宝/数币等平台直付）：chips 入口，点击弹出大图 modal
-    const qrCodes = (c.tips && c.tips.qrCodes && c.tips.qrCodes.length)
-      ? h('span', { className: 'sps-qr-chips' },
+    // 收款码（微信/支付宝等平台直付）：与 USDC 同款直显二维码
+    const payCodes = (c.tips && c.tips.qrCodes && c.tips.qrCodes.length)
+      ? h('div', { className: 'sps-pay-codes' },
           c.tips.qrCodes.map(function (q) {
-            return h('button', {
-              key: q.label,
-              className: 'sps-qr-chip',
-              title: q.label + ' 收款码（点击查看）',
-              onClick: function () { setQrView({ label: q.label, image: q.image }) },
-            }, q.label)
+            return h('div', { key: q.label, className: 'sps-pay-code', title: q.label + ' 收款码（平台直付）' },
+              h('img', { className: 'sps-qr', src: q.image, alt: q.label + ' 收款码' }),
+              h('div', { className: 'sps-pay-label' }, q.label))
           }))
       : null
     if (fiat) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '法币'), fiat))
     if (subs) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '订阅'), subs))
-    if (qrCodes) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '收款码'), qrCodes,
+    if (payCodes) rows.push(h('div', { className: 'sps-pay-row' },
+      h('span', { className: 'sps-label' }, '收款码'),
+      payCodes,
       h('div', { className: 'sps-qrcode-note', style: { width: '100%' } }, '平台直付，不走链上，无致谢墙')))
     return h('div', { key: c.id, className: 'sps-card' }, ...rows)
   })
@@ -295,22 +290,11 @@ function SponsorCenter(props) {
         }))
     : null
 
-  // 收款码大图 modal（点击 chip 弹出）
-  const qrModal = qrView
-    ? h('div', { className: 'sps-overlay', onClick: function () { setQrView(null) } },
-        h('div', { className: 'sps-modal', onClick: function (e) { e.stopPropagation() } },
-          h('button', { className: 'sps-modal-close', title: '关闭', onClick: function () { setQrView(null) } }, '✕'),
-          h('div', { className: 'sps-modal-title' }, qrView.label + ' 收款码'),
-          h('img', { className: 'sps-modal-img', src: qrView.image, alt: qrView.label + ' 收款码' }),
-          h('div', { className: 'sps-qrcode-note', style: { textAlign: 'center' } }, '平台直付，不走链上，无致谢墙')))
-    : null
-
   return h('div', { className: 'sps-root' },
     h('div', { className: 'sps-title' }, '🤝 支持贡献者'),
     cards,
     wall,
-    sponsorSec,
-    qrModal)
+    sponsorSec)
 }
 
 // ── ToolCard ────────────────────────────────────────────────────────────────
