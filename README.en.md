@@ -6,6 +6,16 @@ plugins. Contributors declare their support channels once in `sponsors.json`
 tap from a sponsor-center panel, a settings page, or tool-card credits.
 Pure P2P, zero custody, privacy by default (pseudonymous + unverified badges).
 
+## Screenshots
+
+![Sponsor center page](assets/demo-sponsor-center.png)
+
+*Sponsor center: contributor card with USDC on-chain QR + copy + WeChat/Alipay payment QRs*
+
+![Embedded tip bar in picks plugin](assets/demo-picks-embed.png)
+
+*TipJarEmbed: one-line tip entry inside another plugin's UI*
+
 ## Features
 
 - **Sponsor center**: conversation "Support" tab + settings "Support contributors" page

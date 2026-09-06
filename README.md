@@ -19,6 +19,17 @@ users tip from a sponsor-center panel, a settings page, or tool-card credits.
 - **伦理徽章**（0.1.5）：🟢 自愿打赏 / ⚪ 未确认 / 🔴 付费墙 —— 由注册表 `ethics` 声明驱动，校验强制（自愿+无付费墙是收录前提）
 - **upstream 来源声明**（0.1.6）：插件条目可声明 `upstream` 项目（署名权守门：抄代码无罪，冒名才防，规范 §5.4）
 - **嵌入组件**（0.1.6）：`TipJarEmbed` —— 其他插件一行接入打赏入口（详见 `EMBED.md`）
+- **收款码**（0.2.0）：微信/支付宝等平台直付收款码（`tips.qrCodes`，可选渠道）
+
+## 演示
+
+![打赏罐「支持贡献者」页面](assets/demo-sponsor-center.png)
+
+*打赏罐页面：贡献者卡片展示 USDC 链上二维码 + 复制 + 微信/支付宝收款码*
+
+![荐股插件嵌入打赏条](assets/demo-picks-embed.png)
+
+*TipJarEmbed 嵌入：其他插件（如每日荐股）在自己 UI 里一行接入打赏*
 
 ## 快速开始（30 秒接入）
 
