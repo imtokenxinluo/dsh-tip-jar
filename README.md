@@ -65,7 +65,8 @@ dsh plugin --profile <name> add dsh-tip-jar
     },
     "tips": {
       "usdc": "0x…(40位hex)",       // 可选，格式校验
-      "fiat": [{ "label": "爱发电", "url": "https://…" }]
+      "fiat": [{ "label": "爱发电", "url": "https://…" }],
+      "qrCodes": [{ "label": "微信", "image": "…" }]  // 可选：平台直付收款码
     },
     "subscriptions": [{ "label": "Patreon", "url": "https://…" }]
   }],

@@ -62,7 +62,8 @@ refreshes do not lose it.
     },
     "tips": {
       "usdc": "0x…(40 hex)",         // optional, format-checked
-      "fiat": [{ "label": "Afdian", "url": "https://…" }]
+      "fiat": [{ "label": "Afdian", "url": "https://…" }],
+      "qrCodes": [{ "label": "WeChat", "image": "…" }]  // optional: platform-pay receipt QR
     },
     "subscriptions": [{ "label": "Patreon", "url": "https://…" }]
   }],

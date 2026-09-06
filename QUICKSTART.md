@@ -55,6 +55,10 @@ copy node_modules/dsh-tip-jar/sponsors.example.json sponsors.json
       "fiat": [                   // 可选：法币/平台链接
         { "label": "爱发电", "url": "https://afdian.com/a/你的ID" },
         { "label": "GitHub Sponsors", "url": "https://github.com/sponsors/你的GitHub" }
+      ],
+      "qrCodes": [                // 可选：收款码图片（微信/支付宝/数币等平台直付）
+        { "label": "微信", "image": "https://…/wechat.png 或 /assets/wechat.png" },
+        { "label": "支付宝", "image": "…" }
       ]
     },
     "subscriptions": []           // 可选：订阅（须对应额外交付）
@@ -96,7 +100,7 @@ copy node_modules/dsh-tip-jar/sponsors.example.json sponsors.json
 2. 打开任意会话 → 「支持」Tab
 3. 看到你的卡片 = 上线成功 ✅
 
-受益人此时可以：扫码/复制你的 USDC 地址转账（Polygon）、点击法币链接、看到你的伦理徽章。
+受益人此时可以：扫码/复制你的 USDC 地址转账（Polygon，链上可追踪 → 致谢墙）、点击法币链接、**扫微信/支付宝收款码**（如果你配置了 `qrCodes`，平台直付、不走链上、无致谢墙）、看到你的伦理徽章。
 
 ## 第 5 步（可选）：嵌入你自己的插件 UI
 

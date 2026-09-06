@@ -24,7 +24,8 @@
     "tips": {
       "usdc": "0x…(你的 Polygon USDC 地址)",
       "chains": ["polygon"],
-      "fiat": [{ "label": "GitHub Sponsors", "url": "https://github.com/sponsors/you" }]
+      "fiat": [{ "label": "GitHub Sponsors", "url": "https://github.com/sponsors/you" }],
+      "qrCodes": [{ "label": "微信", "image": "https://…/wechat.png" }]  // 可选：平台直付收款码
     }
   }],
   "plugins": [{
