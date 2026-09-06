@@ -67,11 +67,15 @@ const CSS =
   '.sps-links{display:flex;flex-wrap:wrap;gap:8px}' +
   '.sps-link{font-size:12px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
   '.sps-link:hover{text-decoration:underline}' +
-  '.sps-qrcodes{display:flex;flex-wrap:wrap;gap:8px}' +
-  '.sps-qrcode-item{display:flex;flex-direction:column;align-items:center;gap:2px}' +
-  '.sps-qrcode-img{width:72px;height:72px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;cursor:pointer;background:var(--dsw-alias-bg-base)}' +
-  '.sps-qrcode-img:hover{border-color:var(--dsw-alias-brand-primary)}' +
+  '.sps-qr-chips{display:inline-flex;gap:6px;flex-wrap:wrap}' +
+  '.sps-qr-chip{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:14px;color:var(--dsw-alias-label-primary);cursor:pointer;font-size:11px;padding:3px 12px}' +
+  '.sps-qr-chip:hover{border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-brand-primary)}' +
   '.sps-qrcode-note{font-size:10px;color:var(--dsw-alias-label-secondary);line-height:1.4;margin-top:2px}' +
+  '.sps-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:9999}' +
+  '.sps-modal{position:relative;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:12px;padding:16px;min-width:220px;max-width:80vw;box-shadow:0 8px 30px rgba(0,0,0,.3)}' +
+  '.sps-modal-close{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:14px}' +
+  '.sps-modal-title{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary);margin-bottom:10px;text-align:center}' +
+  '.sps-modal-img{width:240px;height:240px;border-radius:8px;object-fit:contain;display:block;margin:0 auto}' +
   '.sps-sec-title{font-size:11px;color:var(--dsw-alias-label-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}' +
   '.sps-sponsor{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-sponsor b{color:var(--dsw-alias-state-warn-primary)}' +
@@ -79,6 +83,7 @@ const CSS =
   '.sps-tool-head{font-weight:600;margin-bottom:6px}' +
   '.sps-tool-body{font-size:12px;color:var(--dsw-alias-label-secondary);white-space:pre-wrap;margin-bottom:8px}' +
   '.sps-tool-support{font-size:12px;color:var(--dsw-alias-label-secondary);border-top:1px solid var(--dsw-alias-border-l1);padding-top:6px}' +
+  '.sps-tool-fiat{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--dsw-alias-border-l2);margin-top:8px;padding-top:8px}' +
   '.sps-tool-support b{color:var(--dsw-alias-state-warn-primary)}' +
   '.sps-tip-line{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-tip-rank{color:var(--dsw-alias-label-secondary);min-width:16px}' +
@@ -94,6 +99,7 @@ function SponsorCenter(props) {
   const [state, setState] = useState(null)
   const [tipState, setTipState] = useState({ stats: null, present: false, paused: false })
   const [copiedId, setCopiedId] = useState(null)
+  const [qrView, setQrView] = useState(null)
   const dataRef = useRef(null)
   const tipRef = useRef({ stats: null, present: false })
 
@@ -232,21 +238,16 @@ function SponsorCenter(props) {
           return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, '订阅: ' + s.label)
         }))
       : null
-    // 收款码（微信/支付宝/数币等平台直付）：缩略图，点击看大图
+    // 收款码（微信/支付宝/数币等平台直付）：chips 入口，点击弹出大图 modal
     const qrCodes = (c.tips && c.tips.qrCodes && c.tips.qrCodes.length)
-      ? h('div', { className: 'sps-qrcodes' },
+      ? h('span', { className: 'sps-qr-chips' },
           c.tips.qrCodes.map(function (q) {
-            return h('div', { key: q.label, className: 'sps-qrcode-item', title: q.label + ' 收款码（点击查看大图）' },
-              h('img', {
-                className: 'sps-qrcode-img',
-                src: q.image,
-                alt: q.label + ' 收款码',
-                onClick: function () {
-                  try {
-                    if (typeof window !== 'undefined' && window.open) window.open(q.image, '_blank')
-                  } catch (e) { /* ignore */ }
-                },
-              }))
+            return h('button', {
+              key: q.label,
+              className: 'sps-qr-chip',
+              title: q.label + ' 收款码（点击查看）',
+              onClick: function () { setQrView({ label: q.label, image: q.image }) },
+            }, q.label)
           }))
       : null
     if (fiat) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '法币'), fiat))
@@ -294,11 +295,22 @@ function SponsorCenter(props) {
         }))
     : null
 
+  // 收款码大图 modal（点击 chip 弹出）
+  const qrModal = qrView
+    ? h('div', { className: 'sps-overlay', onClick: function () { setQrView(null) } },
+        h('div', { className: 'sps-modal', onClick: function (e) { e.stopPropagation() } },
+          h('button', { className: 'sps-modal-close', title: '关闭', onClick: function () { setQrView(null) } }, '✕'),
+          h('div', { className: 'sps-modal-title' }, qrView.label + ' 收款码'),
+          h('img', { className: 'sps-modal-img', src: qrView.image, alt: qrView.label + ' 收款码' }),
+          h('div', { className: 'sps-qrcode-note', style: { textAlign: 'center' } }, '平台直付，不走链上，无致谢墙')))
+    : null
+
   return h('div', { className: 'sps-root' },
     h('div', { className: 'sps-title' }, '🤝 支持贡献者'),
     cards,
     wall,
-    sponsorSec)
+    sponsorSec,
+    qrModal)
 }
 
 // ── ToolCard ────────────────────────────────────────────────────────────────
