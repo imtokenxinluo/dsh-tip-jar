@@ -67,6 +67,11 @@ const CSS =
   '.sps-links{display:flex;flex-wrap:wrap;gap:8px}' +
   '.sps-link{font-size:12px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
   '.sps-link:hover{text-decoration:underline}' +
+  '.sps-qrcodes{display:flex;flex-wrap:wrap;gap:8px}' +
+  '.sps-qrcode-item{display:flex;flex-direction:column;align-items:center;gap:2px}' +
+  '.sps-qrcode-img{width:72px;height:72px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;cursor:pointer;background:var(--dsw-alias-bg-base)}' +
+  '.sps-qrcode-img:hover{border-color:var(--dsw-alias-brand-primary)}' +
+  '.sps-qrcode-note{font-size:10px;color:var(--dsw-alias-label-secondary);line-height:1.4;margin-top:2px}' +
   '.sps-sec-title{font-size:11px;color:var(--dsw-alias-label-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:4px}' +
   '.sps-sponsor{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-sponsor b{color:var(--dsw-alias-state-warn-primary)}' +
@@ -227,8 +232,27 @@ function SponsorCenter(props) {
           return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, '订阅: ' + s.label)
         }))
       : null
+    // 收款码（微信/支付宝/数币等平台直付）：缩略图，点击看大图
+    const qrCodes = (c.tips && c.tips.qrCodes && c.tips.qrCodes.length)
+      ? h('div', { className: 'sps-qrcodes' },
+          c.tips.qrCodes.map(function (q) {
+            return h('div', { key: q.label, className: 'sps-qrcode-item', title: q.label + ' 收款码（点击查看大图）' },
+              h('img', {
+                className: 'sps-qrcode-img',
+                src: q.image,
+                alt: q.label + ' 收款码',
+                onClick: function () {
+                  try {
+                    if (typeof window !== 'undefined' && window.open) window.open(q.image, '_blank')
+                  } catch (e) { /* ignore */ }
+                },
+              }))
+          }))
+      : null
     if (fiat) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '法币'), fiat))
     if (subs) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '订阅'), subs))
+    if (qrCodes) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '收款码'), qrCodes,
+      h('div', { className: 'sps-qrcode-note', style: { width: '100%' } }, '平台直付，不走链上，无致谢墙')))
     return h('div', { key: c.id, className: 'sps-card' }, ...rows)
   })
 

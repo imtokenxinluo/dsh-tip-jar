@@ -49,6 +49,16 @@ export function validateRegistry(input) {
             checkLink(errors, p + '.tips.fiat[' + j + ']', f)
           })
         }
+        // 收款码图片（微信/支付宝/数币等）：{label, image} — 平台直付，无链上追踪
+        if (c.tips.qrCodes !== undefined) {
+          if (!isArr(c.tips.qrCodes)) errors.push(p + '.tips.qrCodes 必须是数组')
+          else c.tips.qrCodes.forEach(function (q, j) {
+            const qp = p + '.tips.qrCodes[' + j + ']'
+            if (!isObj(q)) { errors.push(qp + ' 必须是对象'); return }
+            if (!isStr(q.label) || !q.label.trim()) errors.push(qp + '.label 缺失（如 微信/支付宝）')
+            if (!isStr(q.image) || !q.image.trim()) errors.push(qp + '.image 缺失（收款码图片 URL 或路径）')
+          })
+        }
       }
       if (c.subscriptions !== undefined) {
         if (!isArr(c.subscriptions)) errors.push(p + '.subscriptions 必须是数组')

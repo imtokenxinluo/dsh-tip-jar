@@ -84,5 +84,28 @@ const badUp3 = JSON.parse(raw)
 badUp3.plugins[0].upstream = 'MIT'
 check('upstream 非对象被拒', validateRegistry(badUp3).ok === false)
 
+// 13. qrCodes 合法结构（收款码：微信/支付宝等）应通过
+const goodQr = JSON.parse(raw)
+goodQr.contributors[0].tips.qrCodes = [
+  { label: '微信', image: 'https://example.com/wechat.png' },
+  { label: '支付宝', image: '/assets/alipay.png' },
+]
+check('qrCodes 合法结构通过', validateRegistry(goodQr).ok === true)
+
+// 14. qrCodes 缺 label 应被拒绝
+const badQr1 = JSON.parse(raw)
+badQr1.contributors[0].tips.qrCodes = [{ image: 'https://example.com/x.png' }]
+check('qrCodes 缺 label 被拒', validateRegistry(badQr1).ok === false)
+
+// 15. qrCodes 缺 image 应被拒绝
+const badQr2 = JSON.parse(raw)
+badQr2.contributors[0].tips.qrCodes = [{ label: '微信' }]
+check('qrCodes 缺 image 被拒', validateRegistry(badQr2).ok === false)
+
+// 16. qrCodes 非数组应被拒绝
+const badQr3 = JSON.parse(raw)
+badQr3.contributors[0].tips.qrCodes = 'wechat'
+check('qrCodes 非数组被拒', validateRegistry(badQr3).ok === false)
+
 console.log(failures === 0 ? '\nALL PASS' : '\n' + failures + ' FAILED')
 process.exit(failures === 0 ? 0 : 1)
