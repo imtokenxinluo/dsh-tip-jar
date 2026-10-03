@@ -104,3 +104,23 @@ export function mergeStats(prev, next) {
 export function formatUsdc(amountUsdc) {
   return '$' + (Math.round(amountUsdc * 100) / 100).toFixed(2)
 }
+
+/**
+ * 把一位贡献者的链上统计渲染成一行可读文本（纯函数，可测）。
+ *
+ * 存在的意义：`supporters`（独立打赏人数）与 `count`（笔数）在聚合阶段就算好了，
+ * 但界面长期只显示金额 —— 对贡献者来说"有多少人支持我"比"总共多少钱"更能说明问题。
+ *
+ * @param {{amountUsdc?: number, count?: number, supporters?: number}|null|undefined} entry
+ * @returns {string} 例如 "$12.30 · 5 笔 · 3 位支持者"；无数据返回空串
+ */
+export function formatTipStats(entry) {
+  if (!entry || typeof entry !== 'object') return ''
+  const amount = Number(entry.amountUsdc) || 0
+  const count = Number(entry.count) || 0
+  const supporters = Number(entry.supporters) || 0
+  const parts = [formatUsdc(amount)]
+  if (count > 0) parts.push(count + ' 笔')
+  if (supporters > 0) parts.push(supporters + ' 位支持者')
+  return parts.join(' · ')
+}

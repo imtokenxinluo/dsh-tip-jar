@@ -3,7 +3,7 @@
 // 通过 Typert Remote 调用 Host（ctx.remote.namespaces.get('tipJar')）
 import { createElement, useState, useEffect, useRef } from 'react'
 import { TYPERT_REMOTE } from './remote.js'
-import { buildGetLogsRequest, parseTransferLogs, aggregateStats, mergeStats, formatUsdc } from './onchain.js'
+import { buildGetLogsRequest, parseTransferLogs, aggregateStats, mergeStats, formatTipStats } from './onchain.js'
 import { TipJarEmbed, createTipJarApi } from './embed.js'
 
 // 链上到账雷达配置（浏览器友好公共 RPC，按序回退；原生 USDC 合约）
@@ -83,7 +83,8 @@ const CSS =
   '.sps-tip-rank{color:var(--dsw-alias-label-secondary);min-width:16px}' +
   '.sps-tip-alias{font-weight:600;color:var(--dsw-alias-label-primary)}' +
   '.sps-tip-amount{color:var(--dsw-alias-state-success-primary);font-weight:600;font-variant-numeric:tabular-nums}' +
-  '.sps-tip-count{color:var(--dsw-alias-label-secondary)}'
+  '.sps-tip-count{color:var(--dsw-alias-label-secondary)}' +
+  '.sps-tip-note{margin-top:6px;font-size:11px;line-height:1.6;color:var(--dsw-alias-label-secondary);opacity:.85}'
 
 // ── SponsorCenter ───────────────────────────────────────────────────────────
 
@@ -210,9 +211,9 @@ function SponsorCenter(props) {
     const rows = [head]
     const tipEntry = tipState.stats && tipState.stats.byContributorId && tipState.stats.byContributorId[c.id]
     if (tipEntry) {
+      // 金额 · 笔数 · 独立支持者数（后者由 onchain 聚合时算出，长期没被显示过）
       rows.push(h('div', { className: 'sps-tip-line' },
-        '🎖 链上已收 ', h('b', { className: 'sps-tip-amount' }, formatUsdc(tipEntry.amountUsdc)),
-        ' · ', String(tipEntry.count), ' 笔'))
+        '🎖 链上已收 ', h('b', { className: 'sps-tip-amount' }, formatTipStats(tipEntry))))
     }
     if (addr) {
       const short = addr.slice(0, 6) + '…' + addr.slice(-4)
@@ -292,10 +293,13 @@ function SponsorCenter(props) {
       const c = byId[id]
       if (!c) continue
       const s = tipState.stats.byContributorId[id]
-      tipEntries.push({ id, alias: c.alias, count: s.count, amountUsdc: s.amountUsdc })
+      tipEntries.push({ id, alias: c.alias, count: s.count, amountUsdc: s.amountUsdc, supporters: s.supporters })
     }
   }
   tipEntries.sort(function (a, b) { return b.amountUsdc - a.amountUsdc })
+  const lastBlock = tipState.stats && tipState.stats.lastBlock
+  // 只读统计面：让贡献者看到"多少人支持我"，而不是只有金额。
+  // 同时如实交代数据边界 —— 链上雷达有覆盖范围，不该假装是完整账本。
   const wall = tipEntries.length
     ? h('div', { className: 'sps-section' },
         h('div', { className: 'sps-sec-title' }, '🎖 致谢墙'),
@@ -303,9 +307,12 @@ function SponsorCenter(props) {
           return h('div', { key: t.id, className: 'sps-tip-line' },
             h('span', { className: 'sps-tip-rank' }, String(i + 1) + '. '),
             h('span', { className: 'sps-tip-alias' }, '@' + t.alias),
-            h('span', { className: 'sps-tip-amount' }, formatUsdc(t.amountUsdc)),
-            h('span', { className: 'sps-tip-count' }, t.count + ' 笔'))
-        }))
+            h('span', { className: 'sps-tip-amount' }, formatTipStats(t)))
+        }),
+        h('div', { className: 'sps-tip-note' },
+          lastBlock
+            ? '统计来自链上转账扫描（Polygon USDC），已扫至区块 ' + String(lastBlock) + '；仅覆盖登记地址的到账，不代表完整账本。'
+            : '统计来自链上转账扫描（Polygon USDC）；仅覆盖登记地址的到账，不代表完整账本。'))
     : null
 
   return h('div', { className: 'sps-root' },

@@ -11,6 +11,7 @@ import {
   aggregateStats,
   mergeStats,
   formatUsdc,
+  formatTipStats,
 } from '../src/onchain.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -117,6 +118,19 @@ const nextM = {
 }
 const mergedM = mergeStats(prevM, nextM)
 check('merge 支持者取并集', mergedM.byContributorId['ghost-trader'].supporters === 2)
+
+// ── formatTipStats：把统计渲染成一行（贡献者可见性）─────────────────────────
+check('统计文本：全字段齐全', formatTipStats({ amountUsdc: 12.3, count: 5, supporters: 3 }) === '$12.30 · 5 笔 · 3 位支持者',
+  formatTipStats({ amountUsdc: 12.3, count: 5, supporters: 3 }))
+check('统计文本：只有金额时不编造笔数/人数', formatTipStats({ amountUsdc: 1 }) === '$1.00', formatTipStats({ amountUsdc: 1 }))
+check('统计文本：有金额与笔数但无支持者数据（旧记录）',
+  formatTipStats({ amountUsdc: 2, count: 2 }) === '$2.00 · 2 笔', formatTipStats({ amountUsdc: 2, count: 2 }))
+check('统计文本：支持者为 0 不显示', formatTipStats({ amountUsdc: 0, count: 1, supporters: 0 }) === '$0.00 · 1 笔',
+  formatTipStats({ amountUsdc: 0, count: 1, supporters: 0 }))
+check('统计文本：空/非法输入返回空串', formatTipStats(null) === '' && formatTipStats(undefined) === '' && formatTipStats('x') === '')
+check('统计文本：字符串数字也能处理（配置/JSON 宽松）',
+  formatTipStats({ amountUsdc: '3.5', count: '2', supporters: '1' }) === '$3.50 · 2 笔 · 1 位支持者',
+  formatTipStats({ amountUsdc: '3.5', count: '2', supporters: '1' }))
 
 console.log(failures === 0 ? '\nALL PASS' : '\n' + failures + ' FAILED')
 process.exit(failures === 0 ? 0 : 1)

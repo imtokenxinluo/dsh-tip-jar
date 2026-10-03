@@ -4,7 +4,7 @@
 // 实现 EMBED.md 的"一行接入"。本模块不注入 slot、不 $mount、不注入样式——
 // 宿主 dsh-tip-jar 的 client 插件负责这些（Remote 命名空间 + CSS）。
 import { createElement, useState, useEffect } from 'react'
-import { formatUsdc } from './onchain.js'
+import { formatTipStats } from './onchain.js'
 
 class TipJarApiError extends Error {
   constructor(code, message) {
@@ -182,7 +182,7 @@ function TipJarEmbed(props) {
     h('span', { className: 'sps-tip-alias' }, '支持作者 @' + c.alias),
     ethicsBadge,
     copyBtn,
-    stat ? h('span', { className: 'sps-tip-amount' }, ' · ' + formatUsdc(stat.amountUsdc) + ' / ' + stat.count + ' 笔') : null)
+    stat ? h('span', { className: 'sps-tip-amount' }, ' · ' + formatTipStats(stat)) : null)
 
   // 收款二维码（USDC 地址，尺寸紧凑）：data URL 来自宿主本地生成，不再请求第三方 CDN。
   // 生成失败时降级为"只有地址与复制按钮"，绝不显示破图。
