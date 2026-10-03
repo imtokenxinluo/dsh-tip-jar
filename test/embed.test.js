@@ -1,6 +1,9 @@
 // dsh-tip-jar/test/embed.test.js
 // 红绿测试：嵌入组件数据组装（resolveEmbed）——未登记/缺贡献者/正常/统计 四态。
-import { resolveEmbed, resolveChannels, registerTipJarSlot } from '../src/embed.js'
+import { resolveEmbed, resolveChannels, registerTipJarSlot, ensureEmbedStyles, EMBED_CLASSES } from '../src/embed.js'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
 
 let failures = 0
 function check(name, cond, detail) {
@@ -143,6 +146,49 @@ const sponsors = {
   check('显式 id 优先于派生值', registered && registered.meta.id === 'my-custom-id')
   const defaultOrder = (function () { registerTipJarSlot(custom, { pluginId: 'p', slot: 'a.b' }); return registered.meta.order })()
   check('未给 order 时默认 80', defaultOrder === 80)
+}
+
+// ── 10. 自带样式：接入方没装 tip-jar 也要能看 ─────────────────────────────────
+// 此前嵌入版依赖宿主 client 注入的 CSS —— 没装 tip-jar 的机器上是裸 HTML。
+{
+  // 幂等：同一份 document 只注入一次
+  const head = { children: [] }
+  const doc = {
+    head: { appendChild: (el) => { head.children.push(el); doc._byId[el.id] = el } },
+    _byId: {},
+    createElement: () => ({ id: '', textContent: '' }),
+    getElementById: (id) => head.children.find((e) => e.id === id) ?? null,
+  }
+  const first = ensureEmbedStyles(doc)
+  const second = ensureEmbedStyles(doc)
+  check('首次调用会插入 style', first === true)
+  check('再次调用是幂等的（不重复插入）', second === false && head.children.length === 1, 'children=' + head.children.length)
+  check('注入的 style 带稳定 id', head.children[0] && head.children[0].id === 'dsh-tip-jar-embed-css', String(head.children[0] && head.children[0].id))
+  check('注入的 CSS 非空', head.children[0] && head.children[0].textContent.length > 200)
+
+  // 无 document（SSR / Node）时必须静默返回 false，不能抛
+  let threw = false
+  let ret = null
+  try { ret = ensureEmbedStyles(null) } catch (e) { threw = true }
+  check('无 document 时不抛错且返回 false', threw === false && ret === false)
+
+  // 关键：组件用到的每个 sps-* 类都必须有自带样式 —— 否则又退回"裸 HTML"
+  const here = dirname(fileURLToPath(import.meta.url))
+  const src = readFileSync(join(here, '..', 'src', 'embed.js'), 'utf8')
+  const body = src.slice(src.indexOf('function TipJarEmbed'))
+  const used = new Set()
+  for (const m of body.matchAll(/className: '([^']+)'/g)) {
+    for (const c of m[1].split(/\s+/)) if (c.startsWith('sps-')) used.add(c)
+  }
+  const missing = [...used].filter((c) => !EMBED_CLASSES.includes(c))
+  check('组件用到的每个 sps-* 类都在自带样式清单里（防漂移）', missing.length === 0, '缺: ' + missing.join(', '))
+
+  // 每个主题变量都应带 fallback，否则主题变量缺失时会不可读
+  const css = readFileSync(join(here, '..', 'src', 'embed.js'), 'utf8')
+  const vars = [...css.matchAll(/var\(--dsw-[a-z0-9-]+([^)]*)\)/g)]
+  const noFallback = vars.filter((m) => !m[1].startsWith(','))
+  check('自带样式里每个主题变量都配了 fallback', noFallback.length === 0, '缺 fallback: ' + noFallback.slice(0, 3).map((m) => m[0]).join(' '))
+  check('自带样式确实被引用（不是死代码）', /ensureEmbedStyles\(\)/.test(src))
 }
 
 process.exit(failures > 0 ? 1 : 0)

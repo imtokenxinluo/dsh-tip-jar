@@ -54,14 +54,6 @@ class TipJarApi {
   qrPng(text) {
     return this.call('qrPng', { text })
   }
-
-  reportContributor(targetId, category, anonId, note) {
-    return this.call('reportContributor', { targetId, category, anonId, note })
-  }
-
-  disputed() {
-    return this.call('disputed', {})
-  }
 }
 
 function createTipJarApi(ctx) {
@@ -110,6 +102,63 @@ export function resolveEmbed(sponsors, pluginId, stats) {
   return { status: 'ok', plugin, contributor, stat }
 }
 
+// ── 自带样式 ────────────────────────────────────────────────────────────────
+// 为什么必须自带：嵌入版此前依赖**宿主 dsh-tip-jar 的 client 注入的 CSS**。
+// 接入方若没装 tip-jar，组件就渲染成**裸 HTML** —— 那样的"一行接入"名不副实。
+//
+// 这份样式只依赖 DSH 的主题变量（任何 DSH 都有），并且**每个变量都配了 fallback**，
+// 所以主题变量缺失或换主题时也不会退化成不可读的黑白块。
+// 类名沿用 sps-*：宿主若也注入了同值样式，重复无害。
+const EMBED_STYLE_ID = 'dsh-tip-jar-embed-css'
+
+const EMBED_CSS = [
+  '.sps-toolcard{border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:10px;background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.06));padding:10px 12px;font-size:12.5px;line-height:1.6;color:var(--dsw-alias-label-primary,inherit)}',
+  '.sps-tool-head{font-weight:600;margin-bottom:6px}',
+  '.sps-tool-support{font-size:12px;color:var(--dsw-alias-label-secondary,inherit);border-top:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.3));padding-top:6px}',
+  '.sps-tool-support b{color:var(--dsw-alias-state-warn-primary,#d08700)}',
+  '.sps-tip-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--dsw-alias-label-secondary,inherit)}',
+  '.sps-tip-alias{font-weight:600;color:var(--dsw-alias-label-primary,inherit)}',
+  '.sps-tip-amount{color:var(--dsw-alias-state-success-primary,#22a06b);font-weight:600;font-variant-numeric:tabular-nums}',
+  '.sps-badge-vol{font-size:10px;color:var(--dsw-alias-state-success-primary,#22a06b);border:1px solid var(--dsw-alias-state-success-primary,#22a06b);border-radius:10px;padding:0 6px}',
+  '.sps-badge-pw{font-size:10px;color:var(--dsw-alias-state-error-primary,#c94a4a);border:1px solid var(--dsw-alias-state-error-primary,#c94a4a);border-radius:10px;padding:0 6px}',
+  '.sps-badge-un{font-size:10px;color:var(--dsw-alias-label-secondary,inherit);border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:10px;padding:0 6px}',
+  '.sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:5px;color:var(--dsw-alias-label-secondary,inherit);cursor:pointer;font-size:11px;padding:2px 8px;display:inline-flex;align-items:center;justify-content:center}',
+  '.sps-btn:hover{color:var(--dsw-alias-label-primary,inherit);border-color:var(--dsw-alias-brand-primary,#4d6bfe)}',
+  '.sps-qr{width:76px;height:76px;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:6px;object-fit:contain}',
+  '.sps-qr-row{display:flex;align-items:center;gap:10px}',
+  '.sps-links{display:flex;flex-wrap:wrap;gap:5px;align-items:center}',
+  '.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary,#4d6bfe);text-decoration:none}',
+  '.sps-link:hover{text-decoration:underline}',
+  '.sps-label{font-size:10px;color:var(--dsw-alias-label-secondary,inherit);text-transform:uppercase;letter-spacing:.04em}',
+  '.sps-pay-meta{display:flex;flex-direction:column;gap:2px}',
+  '.sps-pay-name{font-size:12px;font-weight:600;color:var(--dsw-alias-label-primary,inherit)}',
+  '.sps-qrcode-note{font-size:9px;color:var(--dsw-alias-label-secondary,inherit);line-height:1.3;margin-top:1px}',
+].join('')
+
+/**
+ * 幂等注入自带样式。无 document 时（SSR / Node 测试）返回 false，不抛错。
+ * @param {Document} [doc] 测试可注入替身
+ * @returns {boolean} 本次是否真的插入了 style
+ */
+export function ensureEmbedStyles(doc) {
+  const d = doc ?? (typeof document === 'undefined' ? null : document)
+  if (!d || !d.head || typeof d.createElement !== 'function') return false
+  if (typeof d.getElementById === 'function' && d.getElementById(EMBED_STYLE_ID)) return false
+  const el = d.createElement('style')
+  el.id = EMBED_STYLE_ID
+  el.textContent = EMBED_CSS
+  d.head.appendChild(el)
+  return true
+}
+
+/** 自带样式覆盖的类名（供测试与接入方核对）。 */
+export const EMBED_CLASSES = [
+  'sps-toolcard', 'sps-tool-head', 'sps-tool-support', 'sps-tip-line', 'sps-tip-alias',
+  'sps-tip-amount', 'sps-btn', 'sps-qr', 'sps-qr-row', 'sps-links', 'sps-link',
+  'sps-label', 'sps-pay-meta', 'sps-pay-name', 'sps-qrcode-note',
+  'sps-badge-vol', 'sps-badge-pw', 'sps-badge-un',
+]
+
 // ── TipJarEmbed（嵌入式打赏组件：其他插件一行接入）──────────────────────────
 // 用法：其他插件在自己的 slot 里渲染 <TipJarEmbed ctx={ctx} pluginId="xxx" />
 // 详细接入见 EMBED.md。组件读取注册表对应插件 → 展示贡献者打赏入口。
@@ -124,6 +173,8 @@ function TipJarEmbed(props) {
   const h = createElement
 
   useEffect(function () {
+    // 自带样式：不假设宿主装了 dsh-tip-jar（见文件上方的说明）
+    ensureEmbedStyles()
     let alive = true
     api.listSponsors().then(function (d) { if (alive && d) setData(d) }).catch(function () {})
     api.tipStats().then(function (r) { if (alive && r) setTipState({ stats: r.stats }) }).catch(function () {})

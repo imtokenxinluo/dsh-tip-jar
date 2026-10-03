@@ -27,7 +27,7 @@ class TipJarService extends TypertRemoteService {
   }
 
   async [Service.init]() {
-    // 无异步初始化；注册表在每次 listSponsors 时实时读取
+    // 注册表按需读取（带短 TTL 缓存，见 loadRegistry）
   }
 
   async listSponsors() {
@@ -123,7 +123,26 @@ class TipJarService extends TypertRemoteService {
     throw lastError || new Error('所有统计文件路径均不可写: ' + this.config.statsFiles.join(', '))
   }
 
+  /**
+   * 读注册表。带**短 TTL 缓存**：注册表是人工维护的只读文件（改它的唯一方式是编辑磁盘上的
+   * sponsors.json），而每个接入插件的每次挂载都会调 listSponsors —— 页面里接了 N 处打赏条
+   * 就会读 N 次同一个文件。缓存 10 秒足够消除这种重复，同时保证手工改完几乎立刻生效。
+   *
+   * 失败结果**不缓存**：文件写坏或暂时读不到时，应当立即重试，而不是把错误钉住 10 秒。
+   */
   async loadRegistry() {
+    const ttlMs = typeof this.config.registryTtlMs === 'number' ? this.config.registryTtlMs : 10000
+    const now = Date.now()
+    if (ttlMs > 0 && this.registryCache && now - this.registryCache.at < ttlMs) {
+      return this.registryCache.value
+    }
+    const value = await this.readRegistryFromDisk()
+    // 只缓存成功结果；失败让下一次调用立刻重试
+    if (ttlMs > 0 && value && value.ok) this.registryCache = { at: now, value }
+    return value
+  }
+
+  async readRegistryFromDisk() {
     const fs = this.ctx.fs
     if (!fs) return { ok: false, errors: ['fs 服务不可用'], data: null }
     for (const root of this.config.roots) {
