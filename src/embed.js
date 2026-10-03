@@ -233,4 +233,34 @@ function TipJarEmbed(props) {
     none)
 }
 
-export { TipJarEmbed, TipJarApi, createTipJarApi }
+// ── registerTipJarSlot：真正的一行接入 ──────────────────────────────────────
+// 接入方原本要自己写 slots.inject + slots.register + createElement 三件事，
+// 且每处都要重复同样的样板和"没装 tip-jar 时别崩"的保护。这里一次封装。
+//
+//   registerTipJarSlot(ctx, { pluginId: 'my-plugin', slot: 'conversation.session.header.actions' })
+//
+// 返回与 slots.inject 相同的 disposer（可直接交给 ctx.effect 或忽略）。
+function registerTipJarSlot(ctx, options) {
+  const opts = options || {}
+  const slot = opts.slot
+  if (typeof slot !== 'string' || slot.length === 0) {
+    throw new Error('registerTipJarSlot: options.slot is required')
+  }
+  const slots = ctx && ctx.slots
+  // 没有 slot 服务（或宿主未装 tip-jar）时静默跳过：接入方不该因为打赏入口而崩。
+  if (!slots || typeof slots.inject !== 'function' || typeof slots.register !== 'function') {
+    return function () {}
+  }
+  const id = typeof opts.id === 'string' && opts.id.length > 0
+    ? opts.id
+    : String(opts.pluginId || 'plugin') + '-tipjar'
+  const order = typeof opts.order === 'number' ? opts.order : 80
+  return slots.inject(slot, function () {
+    return slots.register(
+      { name: slot, id: id, order: order },
+      function () { return createElement(TipJarEmbed, { ctx: ctx, pluginId: opts.pluginId }) },
+    )
+  })
+}
+
+export { TipJarEmbed, TipJarApi, createTipJarApi, registerTipJarSlot }

@@ -1,6 +1,6 @@
 // dsh-tip-jar/test/embed.test.js
 // 红绿测试：嵌入组件数据组装（resolveEmbed）——未登记/缺贡献者/正常/统计 四态。
-import { resolveEmbed, resolveChannels } from '../src/embed.js'
+import { resolveEmbed, resolveChannels, registerTipJarSlot } from '../src/embed.js'
 
 let failures = 0
 function check(name, cond, detail) {
@@ -109,6 +109,40 @@ const sponsors = {
   check('旧逻辑对照：只登记收款码时被判为"无入口"', oldEmbedHadEntry(qrOnly) === false)
   check('新逻辑：同样两个贡献者都被认作有入口（修复生效）',
     resolveChannels(fiatOnly).hasAny === true && resolveChannels(qrOnly).hasAny === true)
+}
+
+// ── 9. registerTipJarSlot：一行接入的帮助函数 ────────────────────────────────
+// 接入方最关心的其实不是"组件长什么样"，而是"我加这一行会不会把我的插件搞崩"。
+// 所以这里的重点是：缺参数要立即可见地报错，缺运行环境要安静地跳过。
+{
+  let threw = false
+  try { registerTipJarSlot({}, {}) } catch (e) { threw = true }
+  check('缺 slot 参数 → 同步抛错（不静默失败）', threw === true)
+
+  const noSlots = registerTipJarSlot({}, { slot: 'x.y', pluginId: 'p' })
+  check('ctx 没有 slots 服务 → 返回 no-op disposer 而不是抛错', typeof noSlots === 'function')
+  check('no-op disposer 可安全调用', (function () { try { noSlots(); return true } catch (e) { return false } })())
+
+  let injected = null
+  let registered = null
+  const fakeCtx = {
+    slots: {
+      inject: function (slot, cb) { injected = slot; cb(); return function () {} },
+      register: function (meta, render) { registered = { meta: meta, render: render }; return function () {} },
+    },
+  }
+  registerTipJarSlot(fakeCtx, { pluginId: 'my-plugin', slot: 'conversation.session.header.actions', order: 42 })
+  check('把 slot 名透传给 slots.inject', injected === 'conversation.session.header.actions', String(injected))
+  check('注册 id 默认由 pluginId 派生', registered && registered.meta.id === 'my-plugin-tipjar', JSON.stringify(registered && registered.meta))
+  check('order 被透传', registered && registered.meta.order === 42)
+  check('注册的 name 与 slot 一致', registered && registered.meta.name === 'conversation.session.header.actions')
+  check('render 是函数（渲染 TipJarEmbed）', registered && typeof registered.render === 'function')
+
+  const custom = { slots: fakeCtx.slots }
+  registerTipJarSlot(custom, { pluginId: 'p', slot: 'a.b', id: 'my-custom-id' })
+  check('显式 id 优先于派生值', registered && registered.meta.id === 'my-custom-id')
+  const defaultOrder = (function () { registerTipJarSlot(custom, { pluginId: 'p', slot: 'a.b' }); return registered.meta.order })()
+  check('未给 order 时默认 80', defaultOrder === 80)
 }
 
 process.exit(failures > 0 ? 1 : 0)
