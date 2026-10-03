@@ -68,6 +68,31 @@ function createTipJarApi(ctx) {
   })
 }
 
+// ── resolveChannels：把一个贡献者的 tips 归一成可用通道（纯函数，红绿可测）──────
+// 抽出来的原因：嵌入组件曾经只认 USDC，导致"只登记法币或平台二维码的贡献者在嵌入版里
+// 看不到任何打赏入口"——对真实打赏者等于收不到钱。把归一化做成纯函数后，这条边界有了测试。
+export function resolveChannels(contributor) {
+  const c = contributor || {}
+  const tips = c.tips || {}
+  const usdc = typeof tips.usdc === 'string' && tips.usdc.length > 0 ? tips.usdc : ''
+  const fiat = Array.isArray(tips.fiat)
+    ? tips.fiat.filter(function (f) { return f && typeof f.url === 'string' && f.url.length > 0 && typeof f.label === 'string' })
+    : []
+  const qrCodes = Array.isArray(tips.qrCodes)
+    ? tips.qrCodes.filter(function (q) { return q && typeof q.image === 'string' && q.image.length > 0 && typeof q.label === 'string' })
+    : []
+  const subscriptions = Array.isArray(c.subscriptions)
+    ? c.subscriptions.filter(function (s) { return s && typeof s.url === 'string' && s.url.length > 0 && typeof s.label === 'string' })
+    : []
+  return {
+    usdc: usdc,
+    fiat: fiat,
+    qrCodes: qrCodes,
+    subscriptions: subscriptions,
+    hasAny: Boolean(usdc || fiat.length || qrCodes.length || subscriptions.length),
+  }
+}
+
 // ── resolveEmbed：纯数据组装（红绿可测）───────────────────────────────────
 // 输入注册表 + pluginId + 链上统计 → 输出嵌入组件的渲染数据或降级状态
 export function resolveEmbed(sponsors, pluginId, stats) {
@@ -112,7 +137,8 @@ function TipJarEmbed(props) {
   const ethicsBadge = eth.paidWall === true
     ? h('span', { className: 'sps-badge-pw' }, '🔴 付费墙')
     : (eth.voluntary === true ? h('span', { className: 'sps-badge-vol' }, '🟢 自愿打赏') : h('span', { className: 'sps-badge-un' }, '⚪ 未确认'))
-  const addr = c.tips && c.tips.usdc
+  const channels = resolveChannels(c)
+  const addr = channels.usdc
 
   // 不展示地址文本/二维码（乱码无用），只给复制按钮：一键复制完整地址
   const copyBtn = addr
@@ -143,10 +169,46 @@ function TipJarEmbed(props) {
         h('img', { className: 'sps-qr', src: 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(addr), alt: 'USDC 收款二维码' }))
     : null
 
+  // 法币通道（爱发电 / GitHub Sponsors 等）：只有链接，没有地址 —— 之前这里被整个漏掉，
+  // 结果是"只登记法币渠道的贡献者在嵌入版里看不到任何打赏入口"，等于收不到钱。
+  const fiat = channels.fiat.length
+    ? h('div', { className: 'sps-links' },
+        h('span', { className: 'sps-label' }, '法币'),
+        channels.fiat.map(function (f) {
+          return h('a', { key: f.url, className: 'sps-link', href: f.url, target: '_blank', rel: 'noreferrer' }, f.label)
+        }))
+    : null
+
+  // 订阅通道
+  const subs = channels.subscriptions.length
+    ? h('div', { className: 'sps-links' },
+        h('span', { className: 'sps-label' }, '订阅'),
+        channels.subscriptions.map(function (s) {
+          return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, s.label)
+        }))
+    : null
+
+  // 平台直付收款码（微信 / 支付宝）：图片 URL 由注册表提供，不经过第三方生成服务。
+  // 同样是被漏掉的一条：只登记二维码的贡献者此前在嵌入版里完全没有入口。
+  const payQr = channels.qrCodes.map(function (q) {
+    return h('div', { key: q.label, className: 'sps-qr-row', title: q.label + ' 收款码（平台直付）' },
+      h('img', { className: 'sps-qr', src: q.image, alt: q.label + ' 收款码' }),
+      h('div', { className: 'sps-pay-meta' },
+        h('div', { className: 'sps-pay-name' }, q.label),
+        h('div', { className: 'sps-qrcode-note' }, '扫码直付')))
+  })
+
+  // 一个通道都没有时如实说明，而不是渲染一张空卡片让人以为坏了
+  const none = channels.hasAny ? null : h('div', { className: 'sps-tip-line' }, '该贡献者尚未登记任何打赏方式')
+
   return h('div', { className: 'sps-toolcard' },
     h('div', { className: 'sps-tool-head' }, '🤝 ' + (plugin.name || pluginId)),
     line,
-    qr)
+    fiat,
+    subs,
+    qr,
+    payQr.length ? h('div', null, payQr) : null,
+    none)
 }
 
 export { TipJarEmbed, TipJarApi, createTipJarApi }
