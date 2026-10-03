@@ -87,6 +87,26 @@ const CSS =
 
 // ── SponsorCenter ───────────────────────────────────────────────────────────
 
+/**
+ * USDC 收款二维码：由宿主本地生成（data URL），不再请求第三方 CDN ——
+ * 既不把收款地址交给外部服务，也不受其可用性影响。生成失败时不渲染（降级为仅地址 + 复制按钮）。
+ */
+function QrImage(props) {
+  const api = props.api
+  const text = props.text
+  const [url, setUrl] = useState(null)
+  useEffect(function () {
+    let alive = true
+    if (!api || !text) { setUrl(null); return function () { alive = false } }
+    api.qrPng(text).then(function (v) {
+      if (alive && v && typeof v.dataUrl === 'string') setUrl(v.dataUrl)
+    }).catch(function () { if (alive) setUrl(null) })
+    return function () { alive = false }
+  }, [api, text])
+  if (!url) return null
+  return h('img', { className: props.className || 'sps-qr', src: url, alt: props.alt || '收款二维码' })
+}
+
 function SponsorCenter(props) {
   const api = props.api
   const ctx = props.ctx
@@ -218,7 +238,7 @@ function SponsorCenter(props) {
         h('span', { className: 'sps-label' }, 'USDC (Polygon)'),
         h('input', { className: 'sps-addr', readOnly: true, defaultValue: addr, title: '点击全选后 Ctrl+C 复制', onFocus: function (e) { e.target.select() } }),
         copyBtn)
-      const qr = h('img', { className: 'sps-qr', src: 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(addr), alt: 'USDC ' + short + ' 收款二维码' })
+      const qr = h(QrImage, { api: api, text: addr, className: 'sps-qr', alt: 'USDC ' + short + ' 收款二维码' })
       rows.push(h('div', { className: 'sps-qr-row' }, qr, addrRow))
     }
     const fiat = (c.tips && c.tips.fiat && c.tips.fiat.length)

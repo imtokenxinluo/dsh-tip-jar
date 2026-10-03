@@ -60,6 +60,7 @@
     }
   },
   "dependencies": {
+    "qrcode": "^1.5.4",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
@@ -68,7 +69,6 @@
   },
   "devDependencies": {
     "esbuild": "^0.24.2",
-    "qrcode": "^1.5.4",
     "react": "^18.3.1"
   },
   "scripts": {

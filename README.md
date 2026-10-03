@@ -11,6 +11,8 @@ users tip from a sponsor-center panel, a settings page, or tool-card credits.
 
 - **赞助中心**：会话视图「支持」Tab + 设置页「支持贡献者」页
 - **USDC (Polygon)**：收款二维码 + 复制地址（格式校验 `0x`+40hex）
+  - 二维码由**宿主本地生成**（`src/qr.js`，懒加载 `qrcode` + 缓存）——不请求任何第三方 CDN：
+    收款地址不会交给外部服务，出码也不受他人服务可用性影响；生成失败时降级为"仅地址 + 复制按钮"
 - **法币 / 订阅**：爱发电、GitHub Sponsors、Patreon 等链接
 - **甲方赞助位**：`Sponsored by …` 静态展示（作者直接与甲方洽谈）
 - **隐私默认**：化名即可，未验证徽章，不强制真实身份

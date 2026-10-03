@@ -35,6 +35,11 @@ const TYPERT = {
             name: 'saveTipStats',
             signature: 'async saveTipStats(request: TipJarSaveTipStatsRequest): Promise<TipJarSaveTipStatsResult>',
           },
+          {
+            kind: 'method',
+            name: 'qrPng',
+            signature: 'async qrPng(request: TipJarQrPngRequest): Promise<TipJarQrPngResult>',
+          },
         ],
         types: [
           {
@@ -60,6 +65,14 @@ const TYPERT = {
           {
             name: 'TipJarSaveTipStatsResult',
             declaration: 'export type TipJarSaveTipStatsResult = TipJarResult<{ saved: boolean }>',
+          },
+          {
+            name: 'TipJarQrPngRequest',
+            declaration: 'export interface TipJarQrPngRequest { readonly text: string }',
+          },
+          {
+            name: 'TipJarQrPngResult',
+            declaration: 'export type TipJarQrPngResult = TipJarResult<{ dataUrl: string }>',
           },
         ],
       },

@@ -50,6 +50,10 @@ const tipStatsSchema = z.object({
 
 const saveTipStatsSchema = z.object({ saved: z.boolean() })
 
+// 二维码由宿主本地生成（返回 data URL），不再请求第三方 CDN：
+// 既不把收款地址交给外部服务，也不受其可用性影响。客户端只负责显示。
+const qrPngSchema = z.object({ dataUrl: z.string() })
+
 function def(method, requestSchema, requestType, resultSchema2, resultType) {
   return {
     id: PACKAGE + '#' + NS + '/' + method,
@@ -100,6 +104,13 @@ const DESCRIPTORS = [
     'TipJarSaveTipStatsRequest',
     resultSchema(saveTipStatsSchema),
     'TipJarSaveTipStatsResult',
+  ),
+  def(
+    'qrPng',
+    z.object({ text: z.string() }),
+    'TipJarQrPngRequest',
+    resultSchema(qrPngSchema),
+    'TipJarQrPngResult',
   ),
 ]
 

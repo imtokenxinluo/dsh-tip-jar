@@ -3,6 +3,7 @@
 import { Service } from '@deepseek-ai/cordis'
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { validateRegistry } from './validate.js'
+import { validateQrText, renderQrDataUrl } from './qr.js'
 
 // 默认查找工作区根目录的 sponsors.json；可通过插件配置 config.roots 覆盖
 const DEFAULT_ROOTS = ['sponsors.json']
@@ -61,6 +62,34 @@ class TipJarService extends TypertRemoteService {
     } catch (error) {
       return { ok: false, error: fail('tip-jar-stats-write-failed', error && error.message ? error.message : String(error)) }
     }
+  }
+
+  /**
+   * 本地生成收款地址二维码（返回 data URL）。
+   *
+   * 为什么放在宿主而不是客户端：客户端生成要把 qrcode 打进每个接入插件的 bundle；
+   * 请求第三方 CDN 又等于把收款地址交给外部服务、且服务不可用时二维码直接消失。
+   * 宿主生成一次、缓存复用，接入方零成本。
+   */
+  async qrPng(request) {
+    const check = validateQrText(request && request.text)
+    if (!check.ok) return { ok: false, error: fail('tip-jar-bad-qr-text', check.reason) }
+    try {
+      const dataUrl = await this.renderQr(check.text)
+      return { ok: true, value: { dataUrl } }
+    } catch (error) {
+      return { ok: false, error: fail('tip-jar-qr-failed', error && error.message ? error.message : String(error)) }
+    }
+  }
+
+  async renderQr(text) {
+    if (this.qrCache === undefined) this.qrCache = new Map()
+    const cached = this.qrCache.get(text)
+    if (cached !== undefined) return cached
+    const dataUrl = await renderQrDataUrl(text, { width: 220 })
+    if (this.qrCache.size >= 64) this.qrCache.clear()
+    this.qrCache.set(text, dataUrl)
+    return dataUrl
   }
 
   async readStats() {

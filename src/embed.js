@@ -50,6 +50,11 @@ class TipJarApi {
     return this.call('saveTipStats', { stats })
   }
 
+  /** 宿主本地生成二维码（data URL），避免请求第三方 CDN。 */
+  qrPng(text) {
+    return this.call('qrPng', { text })
+  }
+
   reportContributor(targetId, category, anonId, note) {
     return this.call('reportContributor', { targetId, category, anonId, note })
   }
@@ -115,6 +120,7 @@ function TipJarEmbed(props) {
   const [data, setData] = useState(null)
   const [tipState, setTipState] = useState({ stats: null })
   const [copied, setCopied] = useState(false)
+  const [qrUrl, setQrUrl] = useState(null)
   const h = createElement
 
   useEffect(function () {
@@ -123,6 +129,21 @@ function TipJarEmbed(props) {
     api.tipStats().then(function (r) { if (alive && r) setTipState({ stats: r.stats }) }).catch(function () {})
     return function () { alive = false }
   }, [api, pluginId])
+
+  // 二维码由宿主本地生成（不再请求第三方 CDN）。必须在下面那些提前 return 之前调用 hook，
+  // 所以这里自己解析一次 contributor —— 拿不到地址就保持 null，组件只显示地址与复制按钮。
+  useEffect(function () {
+    let alive = true
+    const r = resolveEmbed(data, pluginId, null)
+    const addr = r.status === 'ok' && r.contributor && r.contributor.tips && typeof r.contributor.tips.usdc === 'string'
+      ? r.contributor.tips.usdc
+      : ''
+    if (!addr) { setQrUrl(null); return function () { alive = false } }
+    api.qrPng(addr).then(function (v) {
+      if (alive && v && typeof v.dataUrl === 'string') setQrUrl(v.dataUrl)
+    }).catch(function () { if (alive) setQrUrl(null) })
+    return function () { alive = false }
+  }, [api, data, pluginId])
 
   const resolved = resolveEmbed(data, pluginId, tipState.stats)
   if (resolved.status === 'loading') return h('div', { className: 'sps-toolcard' }, '🤝 支持作者（加载中…）')
@@ -163,10 +184,11 @@ function TipJarEmbed(props) {
     copyBtn,
     stat ? h('span', { className: 'sps-tip-amount' }, ' · ' + formatUsdc(stat.amountUsdc) + ' / ' + stat.count + ' 笔') : null)
 
-  // 收款二维码（USDC 地址，尺寸紧凑）
-  const qr = addr
+  // 收款二维码（USDC 地址，尺寸紧凑）：data URL 来自宿主本地生成，不再请求第三方 CDN。
+  // 生成失败时降级为"只有地址与复制按钮"，绝不显示破图。
+  const qr = (addr && qrUrl)
     ? h('div', { style: { display: 'flex', justifyContent: 'center', paddingTop: 6 } },
-        h('img', { className: 'sps-qr', src: 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(addr), alt: 'USDC 收款二维码' }))
+        h('img', { className: 'sps-qr', src: qrUrl, alt: 'USDC 收款二维码' }))
     : null
 
   // 法币通道（爱发电 / GitHub Sponsors 等）：只有链接，没有地址 —— 之前这里被整个漏掉，
