@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "dsh-tip-jar sponsors registry",
+  "description": "贡献者打赏注册表（sponsors.json）。字段语义与运行时校验器 src/validate.js 一一对应；本文件供编辑器自动补全、CI 校验和第三方工具消费。schemaVersion 升级即表示字段契约变更。",
+  "type": "object",
+  "required": ["schemaVersion", "contributors", "plugins"],
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "description": "注册表格式版本。当前只接受 1；不兼容变更时递增。"
+    },
+    "privacyNote": {
+      "type": "string",
+      "description": "可选的人类可读说明（例如本文件的公开范围）。"
+    },
+    "contributors": {
+      "type": "array",
+      "description": "贡献者列表。允许为空数组：初始状态没有贡献者是合法的，页面显示空态。",
+      "items": { "$ref": "#/$defs/contributor" }
+    },
+    "plugins": {
+      "type": "array",
+      "description": "插件 -> 贡献者 的映射。pluginId 必须唯一且 contributorId 必须指向已存在的贡献者。",
+      "items": { "$ref": "#/$defs/plugin" }
+    }
+  },
+  "$defs": {
+    "link": {
+      "type": "object",
+      "description": "一个外链通道（法币/订阅）。",
+      "required": ["label", "url"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "description": "显示名，如「爱发电」。" },
+        "url": { "type": "string", "pattern": "^https?://\\S+$", "description": "必须是 http(s) 链接。" }
+      }
+    },
+    "qrCode": {
+      "type": "object",
+      "description": "平台直付收款码（微信/支付宝等）。图片可指向仓库内相对路径或 https 地址；平台直付不经链上，无致谢墙。",
+      "required": ["label", "image"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "description": "收款码所属平台，如「微信」「支付宝」。" },
+        "image": { "type": "string", "minLength": 1, "description": "收款码图片的 URL 或包内相对路径。" }
+      }
+    },
+    "ethics": {
+      "type": "object",
+      "description": "自愿打赏伦理声明。paidWall=true 会触发校验告警（不阻断，但违反自愿打赏规范）。",
+      "properties": {
+        "voluntary": { "type": "boolean", "description": "是否为完全自愿的打赏。" },
+        "paidWall": { "type": "boolean", "description": "是否把打赏置于付费墙后（应始终为 false）。" }
+      }
+    },
+    "tips": {
+      "type": "object",
+      "description": "打赏通道集合。至少应提供一种；四种通道会被前端分别渲染。",
+      "properties": {
+        "usdc": {
+          "type": "string",
+          "pattern": "^0x[0-9a-fA-F]{40}$",
+          "description": "EVM 收款地址（原生 USDC）。"
+        },
+        "chains": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "该地址支持的链，如 [\"polygon\"]。"
+        },
+        "fiat": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/link" },
+          "description": "法币通道链接（爱发电 / GitHub Sponsors 等）。"
+        },
+        "qrCodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/qrCode" },
+          "description": "平台直付收款码。"
+        }
+      }
+    },
+    "contributor": {
+      "type": "object",
+      "required": ["id", "alias", "verified", "tips"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "稳定标识，全表唯一。" },
+        "alias": { "type": "string", "minLength": 1, "description": "展示用化名（隐私默认，不要求真名）。" },
+        "verified": { "type": "boolean", "description": "是否已人工核验身份。" },
+        "bio": { "type": "string", "description": "一句话简介。" },
+        "tips": { "$ref": "#/$defs/tips" },
+        "ethics": { "$ref": "#/$defs/ethics" },
+        "subscriptions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/link" },
+          "description": "周期性支持通道。"
+        }
+      }
+    },
+    "plugin": {
+      "type": "object",
+      "required": ["pluginId", "contributorId"],
+      "properties": {
+        "pluginId": { "type": "string", "minLength": 1, "description": "插件标识（与 npm 包名/工具 id 对应），全表唯一。" },
+        "contributorId": { "type": "string", "minLength": 1, "description": "必须指向 contributors 中已存在的 id。" },
+        "name": { "type": "string", "description": "插件显示名。" },
+        "sponsors": {
+          "type": "array",
+          "description": "甲方赞助位（商业赞助，非打赏）。",
+          "items": {
+            "type": "object",
+            "required": ["name", "message", "url"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "message": { "type": "string", "minLength": 1 },
+              "url": { "type": "string", "pattern": "^https?://\\S+$" }
+            }
+          }
+        },
+        "upstream": {
+          "type": "object",
+          "description": "防抄袭来源声明：fork/引用其他开源项目时必须填写。",
+          "required": ["repo", "author"],
+          "properties": {
+            "repo": { "type": "string", "pattern": "^https?://\\S+$", "description": "上游仓库 URL。" },
+            "author": { "type": "string", "minLength": 1, "description": "上游作者。" },
+            "license": { "type": "string", "description": "上游许可证。" }
+          }
+        }
+      }
+    }
+  }
+}

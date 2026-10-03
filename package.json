@@ -26,7 +26,9 @@
   "files": [
     "lib",
     "src",
+    "bin",
     "cordis.patch.yml",
+    "sponsors.schema.json",
     "README.md",
     "README.en.md",
     "EMBED.md",
@@ -38,6 +40,9 @@
     "assets",
     "CONTRIBUTING.md"
   ],
+  "bin": {
+    "dsh-tip-jar-validate": "./bin/validate-sponsors.mjs"
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
@@ -68,7 +73,8 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node test/registry.test.js"
+    "test": "node test/registry.test.js",
+    "validate": "node bin/validate-sponsors.mjs"
   },
   "repository": {
     "type": "git",

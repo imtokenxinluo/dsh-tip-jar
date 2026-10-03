@@ -94,6 +94,42 @@ copy node_modules/dsh-tip-jar/sponsors.example.json sponsors.json
 
 > ⚠️ 格式错误（地址非法、URL 非法、引用缺失）会在面板显示错误提示，不会崩溃。
 
+## 第 3.5 步：先校验，再重启（推荐）
+
+编辑完 `sponsors.json` 后，用包内自带的命令校验一遍——不用等重启才发现填错：
+
+```bash
+npx dsh-tip-jar-validate sponsors.json
+```
+
+通过时：
+
+```
+✓ sponsors.json 校验通过（1 个贡献者 / 1 个插件）
+```
+
+有问题时逐条指出，**退出码非 0**（可以直接挂在 CI 里）：
+
+```
+✗ contributors[0].tips.usdc 地址格式无效: 0xNOTHEX
+✗ plugins[0].contributorId 未知: MISSING
+```
+
+**编辑器自动补全 / 实时校验**：`sponsors.schema.json` 是机器可读的 JSON Schema，
+在 `sponsors.json` 里加一行 `$schema` 即可让 VSCode 等编辑器补全字段并即时标错：
+
+```json
+{
+  "$schema": "./node_modules/dsh-tip-jar/sponsors.schema.json",
+  "schemaVersion": 1,
+  "contributors": [ … ],
+  "plugins": [ … ]
+}
+```
+
+> 校验规则只有一份实现（`src/validate.js`），Schema 与它由测试逐字比对——
+> 不会出现"编辑器说合法、运行时却拒绝"的情况。
+
 ## 第 4 步：重启并验证
 
 1. 重启 Harness（`/restart` 或重启进程）
