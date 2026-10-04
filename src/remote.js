@@ -66,13 +66,21 @@ function def(method, requestSchema, requestType, resultSchema2, resultType) {
         name: 'request',
         wire: 'request',
         source: 'json',
-        codec: { mode: 'strict', typeSymbol: PACKAGE + '/types#' + requestType, schema: requestSchema },
+        // dsh 0.2 的 typert-loader 要求 strict codec 提供 create() 工厂（返回带 parse() 的
+        // schema）；旧的 schema 字段保留，便于 0.1.x 运行时继续识别。
+        codec: {
+          mode: 'strict',
+          typeSymbol: PACKAGE + '/types#' + requestType,
+          schema: requestSchema,
+          create: () => requestSchema,
+        },
       },
     ],
     result: {
       mode: 'strict',
       typeSymbol: PACKAGE + '/types#' + resultType,
       schema: resultSchema2,
+      create: () => resultSchema2,
     },
     sourceLocation: { file: 'src/index.js', line: 1, column: 1 },
   }
