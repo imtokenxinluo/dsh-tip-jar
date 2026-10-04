@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>dsh-tip-jar 嵌入版 · 自带样式预览</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#1b1b1f;color:#e8e8ea;padding:26px;max-width:780px;margin:0 auto;line-height:1.7}
+  h1{font-size:17px;margin:0 0 6px}
+  h2{font-size:13px;color:#9aa0ad;margin:26px 0 8px;font-weight:600}
+  .note{font-size:12.5px;color:#9aa0ad}
+  code{background:#26262c;padding:1px 5px;border-radius:4px;font-size:12px}
+  .why{font-size:11.5px;color:#c9a227;margin:4px 0 8px}
+  hr{border:0;border-top:1px solid #33333a;margin:26px 0}
+
+  /* ↓↓↓ 以下就是 embed.js 里的 EMBED_CSS，原样复制 ↓↓↓
+     注意：本页**故意不定义任何 --dsw-* 主题变量**，
+     所以下面能看清 = fallback 生效（主题变量缺失也不至于不可读）。 */
+  .sps-toolcard{border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:10px;background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.06));padding:10px 12px;font-size:12.5px;line-height:1.6;color:var(--dsw-alias-label-primary,inherit)}
+  .sps-tool-head{font-weight:600;margin-bottom:6px}
+  .sps-tool-support{font-size:12px;color:var(--dsw-alias-label-secondary,inherit);border-top:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.3));padding-top:6px}
+  .sps-tool-support b{color:var(--dsw-alias-state-warn-primary,#d08700)}
+  .sps-tip-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--dsw-alias-label-secondary,inherit)}
+  .sps-tip-alias{font-weight:600;color:var(--dsw-alias-label-primary,inherit)}
+  .sps-tip-amount{color:var(--dsw-alias-state-success-primary,#22a06b);font-weight:600;font-variant-numeric:tabular-nums}
+  .sps-badge-vol{font-size:10px;color:var(--dsw-alias-state-success-primary,#22a06b);border:1px solid var(--dsw-alias-state-success-primary,#22a06b);border-radius:10px;padding:0 6px}
+  .sps-badge-pw{font-size:10px;color:var(--dsw-alias-state-error-primary,#c94a4a);border:1px solid var(--dsw-alias-state-error-primary,#c94a4a);border-radius:10px;padding:0 6px}
+  .sps-badge-un{font-size:10px;color:var(--dsw-alias-label-secondary,inherit);border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:10px;padding:0 6px}
+  .sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:5px;color:var(--dsw-alias-label-secondary,inherit);cursor:pointer;font-size:11px;padding:2px 8px;display:inline-flex;align-items:center;justify-content:center}
+  .sps-btn:hover{color:var(--dsw-alias-label-primary,inherit);border-color:var(--dsw-alias-brand-primary,#4d6bfe)}
+  .sps-qr{width:76px;height:76px;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:6px;object-fit:contain}
+  .sps-qr-row{display:flex;align-items:center;gap:10px}
+  .sps-links{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .sps-link{font-size:11px;color:var(--dsw-alias-brand-primary,#4d6bfe);text-decoration:none}
+  .sps-link:hover{text-decoration:underline}
+  .sps-label{font-size:10px;color:var(--dsw-alias-label-secondary,inherit);text-transform:uppercase;letter-spacing:.04em}
+  .sps-pay-meta{display:flex;flex-direction:column;gap:2px}
+  .sps-pay-name{font-size:12px;font-weight:600;color:var(--dsw-alias-label-primary,inherit)}
+  .sps-qrcode-note{font-size:9px;color:var(--dsw-alias-label-secondary,inherit);line-height:1.3;margin-top:1px}
+</style>
+</head>
+<body>
+
+<h1>嵌入版打赏条 · 自带样式预览</h1>
+<p class="note">
+  这个页面 <strong>不加载 dsh-tip-jar，也不加载任何插件</strong> —— 只把 <code>embed.js</code> 里的
+  <code>EMBED_CSS</code> 原样贴进来。<br>
+  能正常显示，就说明：接入方不再依赖宿主注入样式，<strong>"一行接入"名副其实了</strong>。
+</p>
+<p class="note">
+  另外，本页<strong>故意不定义任何 <code>--dsw-*</code> 主题变量</strong>（模拟最坏情况）。
+  下面的样式仍然可读 = 每个变量的 fallback 都在起作用。
+</p>
+
+<hr>
+
+<h2>① 只登记 USDC（一直都能显示）</h2>
+<div class="sps-toolcard">
+  <div class="sps-tool-head">🤝 预测交易助手</div>
+  <div class="sps-tool-support">
+    <span class="sps-tip-alias">支持作者 @ghost_trader</span>
+    <span class="sps-badge-vol">🟢 自愿打赏</span>
+    <button class="sps-btn">📋 复制地址</button>
+    <span class="sps-tip-amount"> · $12.30 · 5 笔 · 3 位支持者</span>
+  </div>
+  <div style="display:flex;justify-content:center;padding-top:6px">
+    <img class="sps-qr" alt="USDC 收款二维码"
+         src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='76' height='76'><rect width='76' height='76' fill='%23eee'/><text x='38' y='42' font-size='11' text-anchor='middle' fill='%23666'>QR</text></svg>">
+  </div>
+</div>
+
+<h2>② 只登记法币链接</h2>
+<p class="why">修复前：嵌入版只认 USDC，这类贡献者在嵌入条里<strong>看不到任何打赏入口</strong> —— 等于收不到钱。</p>
+<div class="sps-toolcard">
+  <div class="sps-tool-head">🤝 预测交易助手</div>
+  <div class="sps-tool-support">
+    <span class="sps-tip-alias">支持作者 @ghost_trader</span>
+    <span class="sps-badge-un">⚪ 未确认</span>
+  </div>
+  <div class="sps-links">
+    <span class="sps-label">法币</span>
+    <a class="sps-link" href="#">爱发电</a>
+    <a class="sps-link" href="#">GitHub Sponsors</a>
+  </div>
+</div>
+
+<h2>③ 只登记平台收款码（微信 / 支付宝）</h2>
+<p class="why">同样在修复前完全不可见。注意二维码图片由注册表提供，宿主只负责显示，不经过第三方生成服务。</p>
+<div class="sps-toolcard">
+  <div class="sps-tool-head">🤝 预测交易助手</div>
+  <div class="sps-tool-support">
+    <span class="sps-tip-alias">支持作者 @ghost_trader</span>
+    <span class="sps-badge-vol">🟢 自愿打赏</span>
+  </div>
+  <div class="sps-links">
+    <span class="sps-label">订阅</span>
+    <a class="sps-link" href="#">Patreon</a>
+  </div>
+  <div class="sps-qr-row" title="微信 收款码（平台直付）">
+    <img class="sps-qr" alt="微信 收款码"
+         src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='76' height='76'><rect width='76' height='76' fill='%23e8f5e9'/><text x='38' y='42' font-size='11' text-anchor='middle' fill='%232e7d32'>微信</text></svg>">
+    <div class="sps-pay-meta">
+      <div class="sps-pay-name">微信</div>
+      <div class="sps-qrcode-note">扫码直付</div>
+    </div>
+  </div>
+  <div class="sps-qr-row" title="支付宝 收款码（平台直付）">
+    <img class="sps-qr" alt="支付宝 收款码"
+         src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='76' height='76'><rect width='76' height='76' fill='%23e3f2fd'/><text x='38' y='42' font-size='10' text-anchor='middle' fill='%231565c0'>支付宝</text></svg>">
+    <div class="sps-pay-meta">
+      <div class="sps-pay-name">支付宝</div>
+      <div class="sps-qrcode-note">扫码直付</div>
+    </div>
+  </div>
+</div>
+
+<h2>④ 一个通道都没登记</h2>
+<div class="sps-toolcard">
+  <div class="sps-tool-head">🤝 预测交易助手</div>
+  <div class="sps-tool-support">
+    <span class="sps-tip-alias">支持作者 @ghost_trader</span>
+  </div>
+  <div class="sps-tip-line">该贡献者尚未登记任何打赏方式</div>
+</div>
+
+<hr>
+<p class="note">
+  ①②③④ 四态都能正常渲染。此前 ② 和 ③ 在嵌入版里是空白的 —— 那两个 bug 已修（提交 <code>e7619f4</code>），
+  而"看不到样式"这个坑本轮才真正解决（提交 <code>677fbf8</code>）。
+</p>
+
+</body>
+</html>

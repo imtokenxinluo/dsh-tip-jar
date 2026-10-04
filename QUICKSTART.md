@@ -61,7 +61,7 @@ copy node_modules/dsh-tip-jar/sponsors.example.json sponsors.json
         { "label": "支付宝", "image": "…" }
       ]
     },
-    "subscriptions": []           // 可选：订阅（须对应额外交付）
+    "subscriptions": []           // 可选：订阅（须对应额外交付）；写在 tips 内同样生效（两处合并去重）
   }],
   "plugins": [{
     "pluginId": "your-plugin-id", // 必填：你的插件 ID

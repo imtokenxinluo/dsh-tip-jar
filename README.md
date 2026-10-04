@@ -94,7 +94,7 @@ dsh plugin --profile <name> add dsh-tip-jar
       "fiat": [{ "label": "爱发电", "url": "https://…" }],
       "qrCodes": [{ "label": "微信", "image": "…" }]  // 可选：平台直付收款码
     },
-    "subscriptions": [{ "label": "Patreon", "url": "https://…" }]
+    "subscriptions": [{ "label": "Patreon", "url": "https://…" }]  // 放 tips 内也等价（两处合并、按 url 去重）
   }],
   "plugins": [{
     "pluginId": "dsh-tip-jar",
