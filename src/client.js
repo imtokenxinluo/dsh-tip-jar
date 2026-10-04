@@ -101,7 +101,7 @@ function QrImage(props) {
     if (!api || !text) { setUrl(null); return function () { alive = false } }
     api.qrPng(text).then(function (v) {
       if (alive && v && typeof v.dataUrl === 'string') setUrl(v.dataUrl)
-    }).catch(function () { if (alive) setUrl(null) })
+    }).catch(function (e) { if (alive) { console.warn('[dsh-tip-jar] qrPng failed, USDC QR hidden:', e && e.message ? e.message : e); setUrl(null) } })
     return function () { alive = false }
   }, [api, text])
   if (!url) return null
@@ -247,8 +247,9 @@ function SponsorCenter(props) {
           return h('a', { key: f.url, className: 'sps-link', href: f.url, target: '_blank', rel: 'noreferrer' }, f.label)
         }))
       : null
-    const subs = (c.subscriptions && c.subscriptions.length)
-      ? h('div', { className: 'sps-links' }, c.subscriptions.map(function (s) {
+    const subsList = (c.tips && c.tips.subscriptions && c.tips.subscriptions.length) ? c.tips.subscriptions : (c.subscriptions || [])
+    const subs = subsList.length
+      ? h('div', { className: 'sps-links' }, subsList.map(function (s) {
           return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, '订阅: ' + s.label)
         }))
       : null
