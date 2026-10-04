@@ -74,6 +74,11 @@
           "type": "array",
           "items": { "$ref": "#/$defs/qrCode" },
           "description": "平台直付收款码。"
+        },
+        "subscriptions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/link" },
+          "description": "周期性支持通道（订阅制）。与贡献者顶层的 subscriptions 等价：两处都会被读取、合并并按 url 去重，写哪一处都生效。"
         }
       }
     },
@@ -90,7 +95,7 @@
         "subscriptions": {
           "type": "array",
           "items": { "$ref": "#/$defs/link" },
-          "description": "周期性支持通道。"
+          "description": "周期性支持通道（订阅制）。历史上只认这一层；现与 tips.subscriptions 等价，两处均被采纳并合并去重。"
         }
       }
     },

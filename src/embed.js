@@ -78,9 +78,20 @@ export function resolveChannels(contributor) {
   const qrCodes = Array.isArray(tips.qrCodes)
     ? tips.qrCodes.filter(function (q) { return q && typeof q.image === 'string' && q.image.length > 0 && typeof q.label === 'string' })
     : []
-  const subscriptions = Array.isArray(c.subscriptions)
-    ? c.subscriptions.filter(function (s) { return s && typeof s.url === 'string' && s.url.length > 0 && typeof s.label === 'string' })
-    : []
+  // subscriptions 历史上放在**贡献者顶层**（c.subscriptions），而 usdc/fiat/qrCodes 在 c.tips 内。
+  // 这个层级不一致曾导致"写进 tips.subscriptions 静默失效"——不报错，也永远不显示。
+  // 现在两处都读、按 url 去重合并：写在任一层都生效，既有的顶层写法完全兼容。
+  const subscriptions = []
+  const seenSub = new Set()
+  for (const list of [tips.subscriptions, c.subscriptions]) {
+    if (!Array.isArray(list)) continue
+    for (const s of list) {
+      if (!s || typeof s.url !== 'string' || s.url.length === 0 || typeof s.label !== 'string') continue
+      if (seenSub.has(s.url)) continue
+      seenSub.add(s.url)
+      subscriptions.push(s)
+    }
+  }
   return {
     usdc: usdc,
     fiat: fiat,

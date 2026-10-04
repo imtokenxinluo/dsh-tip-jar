@@ -59,8 +59,16 @@ export function validateRegistry(input) {
             if (!isStr(q.image) || !q.image.trim()) errors.push(qp + '.image 缺失（收款码图片 URL 或路径）')
           })
         }
+        // 订阅链接：历史上只在贡献者顶层校验（c.subscriptions），
+        // 写进 tips 既不报错也不显示 —— 静默失效。现在两处都校验，运行时也会合并读取。
+        if (c.tips.subscriptions !== undefined && c.tips.subscriptions !== null) {
+          if (!isArr(c.tips.subscriptions)) errors.push(p + '.tips.subscriptions 必须是数组')
+          else c.tips.subscriptions.forEach(function (s, j) {
+            checkLink(errors, p + '.tips.subscriptions[' + j + ']', s)
+          })
+        }
       }
-      if (c.subscriptions !== undefined) {
+      if (c.subscriptions !== undefined && c.subscriptions !== null) {
         if (!isArr(c.subscriptions)) errors.push(p + '.subscriptions 必须是数组')
         else c.subscriptions.forEach(function (s, j) {
           checkLink(errors, p + '.subscriptions[' + j + ']', s)

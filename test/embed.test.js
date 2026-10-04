@@ -1,6 +1,7 @@
 // dsh-tip-jar/test/embed.test.js
 // 红绿测试：嵌入组件数据组装（resolveEmbed）——未登记/缺贡献者/正常/统计 四态。
 import { resolveEmbed, resolveChannels, registerTipJarSlot, ensureEmbedStyles, EMBED_CLASSES } from '../src/embed.js'
+import { validateRegistry } from '../src/validate.js'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -191,4 +192,40 @@ const sponsors = {
   check('自带样式确实被引用（不是死代码）', /ensureEmbedStyles\(\)/.test(src))
 }
 
+// ── subscriptions 的层级兼容（曾静默失效）────────────────────────────────────
+// 背景：usdc/fiat/qrCodes 在 c.tips 内，而 subscriptions 历史上只在贡献者顶层。
+// 往 tips 里写 subscriptions 不报错、也永远不显示 —— 正是"静默失效"。
+// 现在两处都读、按 url 去重合并；校验器两处都认，且 null 视同未登记。
+{
+  const gh = { label: 'GitHub Sponsors', url: 'https://github.com/sponsors/x' }
+  const patreon = { label: 'Patreon', url: 'https://patreon.com/y' }
+
+  check('subscriptions：只写顶层仍生效（向后兼容）',
+    resolveChannels({ tips: {}, subscriptions: [gh] }).subscriptions.length === 1)
+  check('subscriptions：只写 tips 内也生效（此前静默失效）',
+    resolveChannels({ tips: { subscriptions: [gh] } }).subscriptions.length === 1)
+  check('subscriptions：两处同一 url 去重',
+    resolveChannels({ tips: { subscriptions: [gh] }, subscriptions: [gh] }).subscriptions.length === 1)
+  const both = resolveChannels({ tips: { subscriptions: [gh] }, subscriptions: [patreon] })
+  check('subscriptions：两处不同 url 合并', both.subscriptions.length === 2, String(both.subscriptions.length))
+  check('subscriptions：合并后 hasAny 为真', both.hasAny === true)
+  check('subscriptions：脏数据（null/缺 url/非数组）不炸且被过滤',
+    resolveChannels({ tips: { subscriptions: [null, { label: 'x' }, 3] }, subscriptions: 'nope' }).subscriptions.length === 0)
+
+  const reg = function (tipsSubs, topSubs) {
+    const tips = { usdc: '0x' + '1'.repeat(40) }
+    if (tipsSubs !== undefined) tips.subscriptions = tipsSubs
+    return {
+      schemaVersion: 1,
+      contributors: [{ id: 'a', alias: 'A', verified: true, tips: tips, subscriptions: topSubs }],
+      plugins: [],
+    }
+  }
+  const v1 = validateRegistry(reg([gh], undefined))
+  check('校验：tips.subscriptions 合法通过', v1.ok === true, v1.errors.join(' | '))
+  check('校验：tips.subscriptions 非数组被拒', validateRegistry(reg('x', undefined)).ok === false)
+  check('校验：tips.subscriptions 缺 url 被拒', validateRegistry(reg([{ label: 'x' }], undefined)).ok === false)
+  const v4 = validateRegistry(reg(null, null))
+  check('校验：subscriptions 为 null 视同未登记（与 tips.usdc 规则一致）', v4.ok === true, v4.errors.join(' | '))
+}
 process.exit(failures > 0 ? 1 : 0)
