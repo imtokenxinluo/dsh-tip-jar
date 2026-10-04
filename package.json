@@ -1,6 +1,6 @@
 {
   "name": "dsh-tip-jar",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Tip jar for DeepSeek Harness: contributors declare USDC / fiat / subscription / sponsor channels in sponsors.json; a sponsor-center panel, settings page and tool-card credits make them one tap away. 打赏罐——开源贡献者的赞助入口。",
   "license": "MIT",
   "type": "module",
@@ -65,7 +65,7 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-typert-protocol": "^0.1.0-rc.6"
+    "@deepseek-ai/dsh-typert-protocol": "^0.1.0-rc.6 || ^0.2.0-rc.2"
   },
   "devDependencies": {
     "esbuild": "^0.24.2",
