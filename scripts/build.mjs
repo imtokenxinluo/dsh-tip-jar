@@ -15,7 +15,11 @@ await build({
   format: 'esm',
   platform: 'node',
   target: 'node20',
-  external: EXTERNAL,
+  // qrcode 必须保持 external：打包它会把 Node 的 require('fs') 变成
+  // "__require('fs')"，在 ESM 宿主里抛 "Dynamic require of fs is not supported"
+  // —— qrPng 每次执行都炸，USDC 的码因此永远不显示（2026-10-04 实测定位）。
+  // external 后由宿主从 node_modules 解析（已实测可解析、可生成）。
+  external: [...EXTERNAL, 'qrcode'],
 })
 
 await build({
