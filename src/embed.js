@@ -138,7 +138,7 @@ const EMBED_CSS = [
   '.sps-qr{width:120px;height:120px;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.35));border-radius:6px;object-fit:contain}',
   '.sps-qr-row{display:flex;align-items:center;gap:10px}',
   '.sps-links{display:flex;flex-wrap:wrap;gap:5px;align-items:center}',
-  '.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary,#4d6bfe);text-decoration:none}',
+  '.sps-links-block{margin-top:8px;padding-top:8px;border-top:1px dashed var(--dsw-alias-border-l1,rgba(128,128,128,.35));display:flex;flex-direction:column;gap:4px}.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary,#4d6bfe);text-decoration:none}',
   '.sps-link:hover{text-decoration:underline}',
   '.sps-label{font-size:10px;color:var(--dsw-alias-label-secondary,inherit);text-transform:uppercase;letter-spacing:.04em}',
   '.sps-pay-meta{display:flex;flex-direction:column;gap:2px}',
@@ -165,7 +165,7 @@ export function ensureEmbedStyles(doc) {
 /** 自带样式覆盖的类名（供测试与接入方核对）。 */
 export const EMBED_CLASSES = [
   'sps-toolcard', 'sps-tool-head', 'sps-tool-support', 'sps-tip-line', 'sps-tip-alias',
-  'sps-tip-amount', 'sps-btn', 'sps-qr', 'sps-qr-row', 'sps-links', 'sps-link',
+  'sps-tip-amount', 'sps-btn', 'sps-qr', 'sps-qr-row', 'sps-links', 'sps-links-block', 'sps-link',
   'sps-label', 'sps-pay-meta', 'sps-pay-name', 'sps-qrcode-note',
   'sps-badge-vol', 'sps-badge-pw', 'sps-badge-un',
 ]
@@ -288,10 +288,9 @@ function TipJarEmbed(props) {
   return h('div', { className: 'sps-toolcard' },
     h('div', { className: 'sps-tool-head' }, '🤝 ' + (plugin.name || pluginId)),
     line,
-    fiat,
-    subs,
     qr,
     payQr.length ? h('div', null, payQr) : null,
+    (fiat || subs) ? h('div', { className: 'sps-links-block' }, fiat, subs) : null,
     none)
 }
 

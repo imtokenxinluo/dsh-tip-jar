@@ -65,7 +65,7 @@ const CSS =
   '.sps-qr{width:120px;height:120px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;object-fit:contain}' +
   '.sps-qr-row{display:flex;align-items:center;gap:10px}' +
   '.sps-links{display:flex;flex-wrap:wrap;gap:5px;align-items:center}' +
-  '.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
+  '.sps-links-block{margin-top:8px;padding-top:8px;border-top:1px dashed var(--dsw-alias-border-l1);display:flex;flex-direction:column;gap:4px}.sps-link{font-size:11px;color:var(--dsw-alias-brand-primary);text-decoration:none}' +
   '.sps-link:hover{text-decoration:underline}' +
   '.sps-pay-meta{display:flex;flex-direction:column;gap:2px}' +
   '.sps-pay-name{font-size:12px;font-weight:600;color:var(--dsw-alias-label-primary)}' +
@@ -277,7 +277,7 @@ function SponsorCenter(props) {
     const subsList = (c.tips && c.tips.subscriptions && c.tips.subscriptions.length) ? c.tips.subscriptions : (c.subscriptions || [])
     const subs = subsList.length
       ? h('div', { className: 'sps-links' }, subsList.map(function (s) {
-          return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, '订阅: ' + s.label)
+          return h('a', { key: s.url, className: 'sps-link', href: s.url, target: '_blank', rel: 'noreferrer' }, s.label)
         }))
       : null
     // 收款码（微信/支付宝等平台直付）：每个二维码独占一行，与 USDC 同款（左码右说明）
@@ -290,11 +290,16 @@ function SponsorCenter(props) {
               h('div', { className: 'sps-qrcode-note' }, '扫码直付')))
         })
       : null
-    if (fiat) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '法币'), fiat))
-    if (subs) rows.push(h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '订阅'), subs))
+    // 二维码先连成完整一块（USDC + 平台直付），文字链接不再插在它们中间
     if (payRows) {
       payRows.forEach(function (r) { rows.push(r) })
       rows.push(h('div', { className: 'sps-qrcode-note' }, '平台直付，不走链上，无致谢墙'))
+    }
+    // 链接型渠道（平台网页，非扫码）统一收在卡片底部，避免切断二维码
+    if (fiat || subs) {
+      rows.push(h('div', { className: 'sps-links-block' },
+        fiat ? h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '法币'), fiat) : null,
+        subs ? h('div', { className: 'sps-links' }, h('span', { className: 'sps-label' }, '订阅'), subs) : null))
     }
     return h('div', { key: c.id, className: 'sps-card' }, ...rows)
   })
