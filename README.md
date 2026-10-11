@@ -1,4 +1,7 @@
-# dsh-tip-jar 🫙
+# dsh-tip-jar
+
+> 🗣 **遇到问题或有建议？** [提 Issue 告诉我](https://github.com/imtokenxinluo/dsh-tip-jar/issues)（附：DSH 版本 + 复现步骤 + 控制台报错，能贴截图更好）。每一条反馈都会回复。
+ 🫙
 
 **打赏罐** — DeepSeek Harness 的贡献者支持系统。开源插件的贡献者只需在
 `sponsors.json` 声明支持渠道（USDC / 法币平台 / 订阅 / 甲方赞助位），用户就能在

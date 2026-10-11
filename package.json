@@ -78,10 +78,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/luoxin10086/dsh-tip-jar.git"
+    "url": "git+https://github.com/imtokenxinluo/dsh-tip-jar.git"
   },
-  "homepage": "https://github.com/luoxin10086/dsh-tip-jar#readme",
+  "homepage": "https://github.com/imtokenxinluo/dsh-tip-jar#readme",
   "bugs": {
-    "url": "https://github.com/luoxin10086/dsh-tip-jar/issues"
+    "url": "https://github.com/imtokenxinluo/dsh-tip-jar/issues"
   }
 }
