@@ -1,7 +1,7 @@
 // dsh-tip-jar/src/client.js
 // Client 半：赞助中心面板（会话「支持」Tab + 设置页）+ 工具卡致谢 + 链上到账雷达
 // 通过 Typert Remote 调用 Host（ctx.remote.namespaces.get('tipJar')）
-import { createElement, useState, useEffect, useRef } from 'react'
+import { createElement, Component, useState, useEffect, useRef } from 'react'
 import { TYPERT_REMOTE } from './remote.js'
 import { buildGetLogsRequest, parseTransferLogs, aggregateStats, mergeStats, formatTipStats } from './onchain.js'
 import { TipJarEmbed, createTipJarApi } from './embed.js'
@@ -92,6 +92,32 @@ const CSS =
  * USDC 收款二维码：由宿主本地生成（data URL），不再请求第三方 CDN ——
  * 既不把收款地址交给外部服务，也不受其可用性影响。生成失败时不渲染（降级为仅地址 + 复制按钮）。
  */
+// 渲染崩溃时把错误直接显示在面板上（此前崩溃=整块空白，无人知道发生了什么）
+class PanelErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { error }
+  }
+  componentDidCatch(error, info) {
+    try { console.error('[dsh-tip-jar] 面板渲染失败:', error, info && info.componentStack) } catch (e) {}
+  }
+  render() {
+    if (this.state.error) {
+      const e = this.state.error
+      return h('div', { className: 'sps-root' },
+        h('div', { className: 'sps-title' }, '🤝 支持贡献者'),
+        h('div', { className: 'sps-errors' }, '⚠️ 面板渲染失败 —— 下面是错误详情（截图发给我即可修复）：'),
+        h('pre', { style: { whiteSpace: 'pre-wrap', fontSize: 11, color: 'var(--dsw-alias-state-error-primary,#c94a4a)' } },
+          String((e && e.stack) || e)),
+        h('div', { className: 'sps-note' }, '这是插件自己的错误显示框（ErrorBoundary），不是 DSH 的问题。'))
+    }
+    return this.props.children
+  }
+}
+
 function QrImage(props) {
   const api = props.api
   const text = props.text
@@ -407,7 +433,7 @@ export default {
     slots.inject('settings.section', function () {
       return slots.register(
         { name: 'settings.section', id: 'sponsors', order: 30, label: '支持贡献者' },
-        function () { return createElement(SponsorCenter, { api: api, ctx: ctx }) })
+        function () { return createElement(PanelErrorBoundary, null, createElement(SponsorCenter, { api: api, ctx: ctx })) })
     })
     // 入口 3：pm_trading_status 工具卡致谢
     slots.inject('tool.call.toolview', function () {
