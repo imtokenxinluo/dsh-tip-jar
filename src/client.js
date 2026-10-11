@@ -101,18 +101,18 @@ class PanelErrorBoundary extends Component {
   static getDerivedStateFromError(error) {
     return { error }
   }
-  componentDidCatch(error, info) {
+  componentDidCatccreateElement(error, info) {
     try { console.error('[dsh-tip-jar] 面板渲染失败:', error, info && info.componentStack) } catch (e) {}
   }
   render() {
     if (this.state.error) {
       const e = this.state.error
-      return h('div', { className: 'sps-root' },
-        h('div', { className: 'sps-title' }, '🤝 支持贡献者'),
-        h('div', { className: 'sps-errors' }, '⚠️ 面板渲染失败 —— 下面是错误详情（截图发给我即可修复）：'),
-        h('pre', { style: { whiteSpace: 'pre-wrap', fontSize: 11, color: 'var(--dsw-alias-state-error-primary,#c94a4a)' } },
+      return createElement('div', { className: 'sps-root' },
+        createElement('div', { className: 'sps-title' }, '🤝 支持贡献者'),
+        createElement('div', { className: 'sps-errors' }, '⚠️ 面板渲染失败 —— 下面是错误详情（截图发给我即可修复）：'),
+        createElement('pre', { style: { whiteSpace: 'pre-wrap', fontSize: 11, color: 'var(--dsw-alias-state-error-primary,#c94a4a)' } },
           String((e && e.stack) || e)),
-        h('div', { className: 'sps-note' }, '这是插件自己的错误显示框（ErrorBoundary），不是 DSH 的问题。'))
+        createElement('div', { className: 'sps-note' }, '这是插件自己的错误显示框（ErrorBoundary），不是 DSH 的问题。'))
     }
     return this.props.children
   }
