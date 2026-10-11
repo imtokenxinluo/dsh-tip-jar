@@ -59,7 +59,7 @@ const CSS =
   '.sps-bio{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-addr-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' +
   '.sps-label{font-size:10px;color:var(--dsw-alias-label-secondary);text-transform:uppercase;letter-spacing:.04em}' +
-  '.sps-addr{font-family:ui-monospace,Consolas,monospace;font-size:11px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:2px 6px;width:200px;color:var(--dsw-alias-label-primary)}' +
+  '.sps-addr{flex:1 1 auto;min-width:0;font-family:ui-monospace,Consolas,monospace;font-size:11px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:2px 6px;width:200px;color:var(--dsw-alias-label-primary)}' +
   '.sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:5px;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:11px;padding:2px 8px;display:inline-flex;align-items:center;justify-content:center}' +
   '.sps-btn:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}' +
   '.sps-qr{width:120px;height:120px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;object-fit:contain}' +
