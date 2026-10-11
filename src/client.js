@@ -119,6 +119,7 @@ class PanelErrorBoundary extends Component {
 }
 
 function QrImage(props) {
+  const h = createElement
   const api = props.api
   const text = props.text
   const [url, setUrl] = useState(null)
