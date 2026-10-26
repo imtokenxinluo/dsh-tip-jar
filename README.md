@@ -1,7 +1,6 @@
-# dsh-tip-jar
+# dsh-tip-jar 🫙
 
 > 🗣 **遇到问题或有建议？** [提 Issue 告诉我](https://github.com/imtokenxinluo/dsh-tip-jar/issues)（附：DSH 版本 + 复现步骤 + 控制台报错，能贴截图更好）。每一条反馈都会回复。
- 🫙
 
 **打赏罐** — DeepSeek Harness 的贡献者支持系统。开源插件的贡献者只需在
 `sponsors.json` 声明支持渠道（USDC / 法币平台 / 订阅 / 甲方赞助位），用户就能在
@@ -9,6 +8,23 @@
 
 A tip jar for DeepSeek Harness: contributors declare their support channels once;
 users tip from a sponsor-center panel, a settings page, or tool-card credits.
+
+## 30 秒上手
+
+```bash
+dsh plugin --profile <你的 profile> add dsh-tip-jar
+```
+
+装完你会看到：
+
+- **设置 → 支持贡献者**：贡献者登记的全部打赏入口 —— USDC 二维码、微信/支付宝收款码、法币链接、订阅
+- 任何嵌入了 `TipJarEmbed` 的插件（例如 `dsh-stock-picks`）里，多出一条「支持作者」条
+- USDC 地址一键复制；**二维码在本机生成**，收款地址不经过任何第三方服务
+
+**适合**：想给插件作者打赏的用户、想收打赏的插件作者。
+**不适合**：需要托管资金、自动分账或 KYC 的场景 —— 本插件全程不碰钱。
+
+校验自己的注册表：`npx dsh-tip-jar-validate sponsors.json`
 
 ## 功能
 

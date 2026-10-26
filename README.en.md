@@ -6,6 +6,23 @@ plugins. Contributors declare their support channels once in `sponsors.json`
 tap from a sponsor-center panel, a settings page, or tool-card credits.
 Pure P2P, zero custody, privacy by default (pseudonymous + unverified badges).
 
+## 30-second setup
+
+```bash
+dsh plugin --profile <your-profile> add dsh-tip-jar
+```
+
+What you get:
+
+- **Settings → Support contributors**: every channel the contributor declared — USDC QR, WeChat/Alipay payment QRs, fiat links, subscriptions
+- A "support the author" bar in any plugin that embeds `TipJarEmbed` (e.g. `dsh-stock-picks`)
+- One-click address copy; the QR is **generated locally**, so the payout address never reaches a third party
+
+**For**: users who want to tip plugin authors, and authors who want to be tipped.
+**Not for**: custody, automated splitting, or KYC — this plugin never touches funds.
+
+Validate your registry: `npx dsh-tip-jar-validate sponsors.json`
+
 ## Screenshots
 
 ![Sponsor center page](assets/demo-sponsor-center.png)
