@@ -76,7 +76,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node test/registry.test.js",
+    "test": "node scripts/test-all.mjs",
     "validate": "node bin/validate-sponsors.mjs"
   },
   "repository": {
