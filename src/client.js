@@ -59,7 +59,7 @@ const CSS =
   '.sps-bio{font-size:12px;color:var(--dsw-alias-label-secondary)}' +
   '.sps-addr-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' +
   '.sps-label{font-size:10px;color:var(--dsw-alias-label-secondary);text-transform:uppercase;letter-spacing:.04em}' +
-  '.sps-addr{flex:1 1 auto;min-width:0;font-family:ui-monospace,Consolas,monospace;font-size:11px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:2px 6px;width:200px;color:var(--dsw-alias-label-primary)}' +
+  '.sps-addr{flex:1 1 44ch;min-width:44ch;font-family:ui-monospace,Consolas,monospace;font-size:11px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:2px 6px;color:var(--dsw-alias-label-primary)}' +
   '.sps-btn{background:none;border:1px solid var(--dsw-alias-border-l1);border-radius:5px;color:var(--dsw-alias-label-secondary);cursor:pointer;font-size:11px;padding:2px 8px;display:inline-flex;align-items:center;justify-content:center}' +
   '.sps-btn:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}' +
   '.sps-qr{width:120px;height:120px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;object-fit:contain}' +
@@ -267,7 +267,7 @@ function SponsorCenter(props) {
             h('path', { d: 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1' })))
       const addrRow = h('div', { className: 'sps-addr-row' },
         h('span', { className: 'sps-label' }, 'USDC (Polygon)'),
-        h('input', { className: 'sps-addr', readOnly: true, defaultValue: addr, title: '点击全选后 Ctrl+C 复制', onFocus: function (e) { e.target.select() } }),
+        h('input', { className: 'sps-addr', readOnly: true, defaultValue: addr, title: addr + '（点击全选后 Ctrl+C 复制）', onFocus: function (e) { e.target.select() } }),
         copyBtn)
       const qr = h(QrImage, { api: api, text: addr, className: 'sps-qr', alt: 'USDC ' + short + ' 收款二维码' })
       rows.push(h('div', { className: 'sps-qr-row' }, qr, addrRow))

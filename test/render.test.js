@@ -79,6 +79,20 @@ for (const rel of ['src/client.js', 'src/embed.js']) {
   check(rel + ' 没有标识符中嵌入 createElement', !/[A-Za-z_]createElement/.test(src))
 }
 
+// ── 5. 地址框不许被固定宽度压扁 ──
+// 2026-11-03：USDC 地址（42 字符）在 200px 固定宽度里被截掉尾巴，看起来像"地址短了一截"，
+// 有让人手动抄错的风险。这里守住"给足宽度"这条不变量。
+{
+  const src = readFileSync(new URL('../src/client.js', import.meta.url), 'utf8')
+  const rule = /\.sps-addr\{([^}]*)\}/.exec(src)
+  check('存在 .sps-addr 样式规则', !!rule)
+  if (rule) {
+    const css = rule[1]
+    check('地址框没有写死像素宽度', !/width:\s*\d+px/.test(css), css.slice(0, 120))
+    const minCh = /min-width:\s*(\d+)ch/.exec(css)
+    check('地址框 min-width >= 42ch（42 位地址放得下）', !!minCh && Number(minCh[1]) >= 42, minCh ? minCh[0] : '未设置')
+  }
+}
 console.log('')
 if (failures > 0) { console.error('✗ ' + failures + ' 项渲染检查失败'); process.exit(1) }
 console.log('✓ 渲染检查全部通过')
