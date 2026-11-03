@@ -101,7 +101,7 @@ class PanelErrorBoundary extends Component {
   static getDerivedStateFromError(error) {
     return { error }
   }
-  componentDidCatccreateElement(error, info) {
+  componentDidCatch(error, info) {
     try { console.error('[dsh-tip-jar] 面板渲染失败:', error, info && info.componentStack) } catch (e) {}
   }
   render() {
@@ -456,3 +456,7 @@ export default {
 }
 
 export { TipJarEmbed } from './embed.js'
+export { QrImage, SponsorCenter, ToolCard, PanelErrorBoundary }
+
+// 上面这行只服务于测试（test/render.test.js）：把内部组件暴露出来，让测试能真的渲染一遍。
+// 浏览器构建里这些命名导出不会被使用，不影响产物大小。
