@@ -3,15 +3,21 @@
 > 每条标注 **必更**（遇到这个问题的人）或 **可跳**（没遇到的人不更新也不会出事）。
 > 完整历史见 `git log`；发布纪律见 `RELEASING.md`。
 
-## Unreleased（尚未发布）
+## 0.2.7 — 2026-11-03
 
-**可跳** —— 除非你在用嵌入式打赏条（`TipJarEmbed`）
+**可跳** —— 除非你遇到过面板整块空白，或你在用嵌入式打赏条
 
 - **修三处静默失败**：嵌入条 `listSponsors` 失败时，此前会永远停在"加载中…"；
   现在显示"加载失败：<原因>"并打 `console.warn`。`tipStats`（只影响致谢墙）与
   `saveTipStats`（链上进度未持久化）失败也改为告警而不是吞掉。
   与 0.2.4 修掉的 qrPng 静默失败属于同一类问题 —— 功能坏了，界面却什么都不说。
-- `npm test` 现在真的跑全部 6 个测试文件（此前只跑 `registry.test.js` 一个）。
+- **错误日志方法名被改坏**：`componentDidCatch` 曾被误写成 `componentDidCatccreateElement`，
+  React 从不调用它 —— 面板崩溃时控制台空白，而这正是 ErrorBoundary 存在的意义。已修复。
+- **新增渲染回归测试**（`test/render.test.js`，14 项）：真的把 QrImage / SponsorCenter /
+  ToolCard / TipJarEmbed / ErrorBoundary 渲染一遍。此前 122 项测试只测纯函数，
+  面板整块空白也能全绿 —— 这个盲区现在补上了。
+- `npm test` 现在真的跑全部 7 个测试文件（此前只跑 `registry.test.js` 一个）。
+- `files` 补上 `CHANGELOG.md` / `RELEASING.md`（npm 不会自动打包这两个）。
 - README 顶部新增「30 秒上手」；新增 `RELEASING.md`（发布纪律）。
 
 ## 0.2.6 — 2026-10-18
