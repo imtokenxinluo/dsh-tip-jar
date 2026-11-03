@@ -181,14 +181,24 @@ function TipJarEmbed(props) {
   const [tipState, setTipState] = useState({ stats: null })
   const [copied, setCopied] = useState(false)
   const [qrUrl, setQrUrl] = useState(null)
+  // 加载失败要能说出来：此前 listSponsors 失败被空 catch 吞掉，界面永远停在"加载中…"
+  const [loadError, setLoadError] = useState(null)
   const h = createElement
 
   useEffect(function () {
     // 自带样式：不假设宿主装了 dsh-tip-jar（见文件上方的说明）
     ensureEmbedStyles()
     let alive = true
-    api.listSponsors().then(function (d) { if (alive && d) setData(d) }).catch(function () {})
-    api.tipStats().then(function (r) { if (alive && r) setTipState({ stats: r.stats }) }).catch(function () {})
+    api.listSponsors().then(function (d) { if (alive && d) setData(d) }).catch(function (e) {
+      if (!alive) return
+      const msg = e && e.message ? e.message : String(e)
+      console.warn('[dsh-tip-jar] embed: listSponsors 失败（打赏条无法显示）:', msg)
+      setLoadError(msg)
+    })
+    api.tipStats().then(function (r) { if (alive && r) setTipState({ stats: r.stats }) }).catch(function (e) {
+      // 统计只影响致谢墙，不阻塞打赏入口；但要留痕，别静默
+      if (alive) console.warn('[dsh-tip-jar] embed: tipStats 失败（链上统计暂缺）:', e && e.message ? e.message : e)
+    })
     return function () { alive = false }
   }, [api, pluginId])
 
@@ -208,7 +218,7 @@ function TipJarEmbed(props) {
   }, [api, data, pluginId])
 
   const resolved = resolveEmbed(data, pluginId, tipState.stats)
-  if (resolved.status === 'loading') return h('div', { className: 'sps-toolcard' }, '🤝 支持作者（加载中…）')
+  if (resolved.status === 'loading') return h('div', { className: 'sps-toolcard' }, loadError ? ('🤝 支持作者（加载失败：' + loadError + '）') : '🤝 支持作者（加载中…）')
   if (resolved.status === 'unregistered') return h('div', { className: 'sps-toolcard sps-tip-line' }, '该插件未在赞助注册表登记（sponsors.json）')
   if (resolved.status === 'no-contributor') return h('div', { className: 'sps-toolcard sps-tip-line' }, '贡献者未登记')
 

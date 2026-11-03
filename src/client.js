@@ -190,7 +190,10 @@ function SponsorCenter(props) {
         const merged = mergeStats(tipRef.current.stats || { byContributorId: {}, lastBlock: 0 }, agg)
         tipRef.current = { stats: merged, present: true }
         if (alive) setTipState({ stats: merged, present: true, paused: false })
-        api.saveTipStats(merged).catch(function () {})
+        api.saveTipStats(merged).catch(function (e) {
+          // 统计写盘失败不该静默：链上进度会回退，用户却看不到任何提示
+          console.warn('[dsh-tip-jar] saveTipStats 失败（链上统计进度未持久化）:', e && e.message ? e.message : e)
+        })
       } catch (e) {
         if (alive) setTipState(function (prev) { return { stats: prev.stats, present: prev.present, paused: true } })
       }
@@ -364,7 +367,9 @@ function ToolCard(props) {
     let alive = true
     api.listSponsors().then(function (d) {
       if (alive && d) setData(d)
-    }).catch(function () {})
+    }).catch(function (e) {
+      if (alive) console.warn('[dsh-tip-jar] tool card: listSponsors 失败:', e && e.message ? e.message : e)
+    })
     return function () { alive = false }
   }, [api])
 
