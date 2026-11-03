@@ -41,7 +41,9 @@
     "sponsors.example.json",
     "QUICKSTART.md",
     "assets",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "RELEASING.md"
   ],
   "bin": {
     "dsh-tip-jar-validate": "./bin/validate-sponsors.mjs"
